@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary     = "Integrate Foreman with the Linköping University CMDB"
   spec.description = spec.summary
   spec.license     = "GPL-3.0"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 2.7.0"
 
   spec.files = Dir["{app,config,db,lib}/**/*.{rake,rb}"] + %w[LICENSE.txt README.md]
 

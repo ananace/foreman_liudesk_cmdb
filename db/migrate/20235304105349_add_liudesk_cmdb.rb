@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Main database migration
 class AddLiudeskCmdb < ActiveRecord::Migration[6.1]
   def change
     create_table :liudesk_cmdb_servers do |t|
@@ -20,8 +21,8 @@ class AddLiudeskCmdb < ActiveRecord::Migration[6.1]
       t.string :asset_type, null: false
       t.string :asset_id, null: true
       t.string :hardware_id, null: true
+      t.timestamp :full_sync_at, null: true
 
-      # t.timestamp :last_full_sync, null: true
       t.timestamps null: false
     end
 

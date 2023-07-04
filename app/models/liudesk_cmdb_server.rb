@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+# Wrapper for the CMDB API client
+#
+# Handles converting asset type symbols into models
 class LiudeskCMDBServer < ApplicationRecord
+  # Allows reading the name in safemode
   class Jail < Safemode::Jail
     allow :name
   end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ForemanLiudeskCMDB
+  # Plugin engine
   class Engine < ::Rails::Engine
     engine_name "foreman_liudesk_cmdb"
 

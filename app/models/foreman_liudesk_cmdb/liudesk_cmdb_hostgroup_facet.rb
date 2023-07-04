@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 module ForemanLiudeskCMDB
+  # Main hostgroup facet
+  #
+  # Only tracks coarse asset type to ease configuration across hostgroups
   class LiudeskCMDBHostgroupFacet < ApplicationRecord
+    # Allow the use of the configured asset type in jails
     class Jail < Safemode::Jail
       allow :asset_type
     end

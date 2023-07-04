@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 module ForemanLiudeskCMDB
+  # CMDB extensions
+  #
+  # Adds helper methods for working with client status and CMDB facet
   module HostExtensions
     extend ActiveSupport::Concern
 

@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 module ForemanLiudeskCMDB
+  # Main host facet for CMDB asset link
+  #
+  # Tracks asset and hardware objects separately to ease lookup
   class LiudeskCMDBFacet < ApplicationRecord
+    # Allow use of asset type in jails
     class Jail < Safemode::Jail
       allow :asset_type
     end
