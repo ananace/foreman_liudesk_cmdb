@@ -1,4 +1,7 @@
 ---
+variables:
+  CI_EXTRA_PLUGIN_DEPENDENCIES: "gem 'liudesk_cmdb', git: 'https://gitlab.liu.se/ITI/ruby-liudesk-cmdb'"
+
 include:
   - project: ITI/ci-pipelines
     file: '/foreman-module.yaml'
