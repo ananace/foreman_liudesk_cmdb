@@ -48,9 +48,7 @@ module ForemanLiudeskCMDB
     end
 
     def cmdb_client?
-      return unless liudesk_cmdb_facet
-
-      liudesk_cmdb_facet.client?
+      liudesk_cmdb_facet&.client?
     end
 
     def cmdb_client=(client)
