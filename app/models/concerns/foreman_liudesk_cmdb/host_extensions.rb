@@ -26,6 +26,7 @@ module ForemanLiudeskCMDB
         #               only_explicit: true
 
         after_update :ensure_cmdb_entry
+        before_destroy :remove_cmdb_entry
       end
     end
 
@@ -145,6 +146,16 @@ module ForemanLiudeskCMDB
       true
     rescue StandardError => e
       Foreman::Logging.exception "Failed to update CMDB entry - #{e.class}: #{e}", e, logger: "foreman_liudesk_cmdb"
+      nil
+    end
+
+    def remove_cmdb_entry
+      return unless liudesk_cmdb_facet
+      return unless liudesk_cmdb_facet.asset_id
+
+      liudesk_cmdb_facet.asset(thin: true).destroy
+    rescue StandardError => e
+      Foreman::Logging.exception "Failed to remove CMDB entry - #{e.class}: #{e}", e, logger: "foreman_liudesk_cmdb"
       nil
     end
   end
