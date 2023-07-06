@@ -41,7 +41,7 @@ class LiudeskCMDBServer < ApplicationRecord
 
   def get_asset(asset_type, asset_id, thin: false)
     klass = LiudeskCMDB::Models.const_get(asset_type.to_s.camel_case(capitalized: true).to_sym)
-    return klass.new connection, asset_id if thin
+    return klass.new(connection).tap { |asset| asset.identifier = asset_id } if thin
 
     klass.get connection, asset_id
   end
