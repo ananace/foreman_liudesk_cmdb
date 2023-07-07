@@ -8,11 +8,8 @@ module ForemanLiudeskCMDB
     extend ActiveSupport::Concern
 
     def self.prepended(base)
-      base.class_eval do
+      base.instance_eval do
         # TODO
-        # after_build :ensure_passwordstate_host
-        # before_provision :remove_passwordstate_host
-
         # has_one :liudesk_cmdb_facet,
         #         class_name: "ForemanLiudeskCMDB::LiudeskCMDBFacet",
         #         foreign_key: :host_id,
@@ -93,7 +90,8 @@ module ForemanLiudeskCMDB
       info = cmdb_hardware_search
       info.merge!(
         make: facts["dmi::manufacturer"] || "N/A",
-        model: facts["dmi::product::name"]
+        model: facts["dmi::product::name"],
+        hostname: name
       )
 
       info[:mac_and_network_access_roles] = [mac: "", networkAccessRole: "None"] if create
@@ -104,8 +102,6 @@ module ForemanLiudeskCMDB
 
       info.compact
     end
-
-    private
 
     def ensure_cmdb_entry
       return unless liudesk_cmdb_facet
@@ -153,7 +149,14 @@ module ForemanLiudeskCMDB
       return unless liudesk_cmdb_facet
       return unless liudesk_cmdb_facet.asset_id
 
-      liudesk_cmdb_facet.asset(thin: true).destroy
+      asset = liudesk_cmdb_facet.asset(thin: true)
+
+      # XXX Rename before deprecation to avoid collision
+      # This is temporary until deprecation supports name storage
+      asset.identifier += "-depr-#{Time.now.to_i}"
+      asset.save!
+
+      asset.destroy
     rescue StandardError => e
       Foreman::Logging.exception "Failed to remove CMDB entry - #{e.class}: #{e}", e, logger: "foreman_liudesk_cmdb"
       nil
