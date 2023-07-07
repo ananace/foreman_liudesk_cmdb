@@ -40,19 +40,19 @@ class LiudeskCMDBServer < ApplicationRecord
   default_scope -> { order("liudesk_cmdb_servers.name") }
 
   def get_asset(asset_type, asset_id, thin: false)
-    klass = LiudeskCMDB::Models.const_get(asset_type.to_s.camel_case(capitalized: true).to_sym)
+    klass = LiudeskCMDB::Models.const_get(asset_type.to_s._cmdb_camel_case(capitalized: true).to_sym)
     return klass.new(connection, asset_id) if thin
 
     klass.get connection, asset_id
   end
 
   def find_asset(asset_type, **search)
-    klass = LiudeskCMDB::Models.const_get(asset_type.to_s.camel_case(capitalized: true).to_sym)
+    klass = LiudeskCMDB::Models.const_get(asset_type.to_s._cmdb_camel_case(capitalized: true).to_sym)
     klass.search connection, op: :or, **search
   end
 
   def create_asset(asset_type, save: true, **data)
-    klass = LiudeskCMDB::Models.const_get(asset_type.to_s.camel_case(capitalized: true).to_sym)
+    klass = LiudeskCMDB::Models.const_get(asset_type.to_s._cmdb_camel_case(capitalized: true).to_sym)
     asset = klass.new connection, **data
     asset.create if save
     asset
