@@ -52,6 +52,9 @@ module ForemanLiudeskCMDB
       new_asset = nil
       begin
         new_asset = liudesk_cmdb_server.get_asset(asset_model_type, host.name)
+      rescue LiudeskCMDB::NotAcceptableError
+        # Asset already exists, but as a different type
+        raise
       rescue LiudeskCMDB::Error
         # Asset not found, create a new one
       end
