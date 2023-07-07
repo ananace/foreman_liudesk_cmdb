@@ -49,7 +49,7 @@ module ForemanLiudeskCMDB
       info[:network_access_role] = "None" if create
       info[:operating_system] = os&.title || "N/A"
       info[:operating_system_type] = os&.name || "N/A"
-      info[:operating_system_install_date] = installed_at
+      info[:operating_system_install_date] = installed_at&.round
 
       if managed?
         info[:management_system] = "ITI-Foreman"
