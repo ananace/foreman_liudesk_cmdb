@@ -18,6 +18,7 @@ module ForemanLiudeskCMDB
 
     validates_lengths_from_database
 
+    validates :host, presence: true, allow_blank: false
     validates :asset_type, presence: true
 
     def asset_model_type
