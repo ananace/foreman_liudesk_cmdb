@@ -7,24 +7,9 @@ module ForemanLiudeskCMDB
   module HostExtensions
     extend ActiveSupport::Concern
 
-    def self.prepended(base)
-      base.instance_eval do
-        # TODO
-        # has_one :liudesk_cmdb_facet,
-        #         class_name: "ForemanLiudeskCMDB::LiudeskCMDBFacet",
-        #         foreign_key: :host_id,
-        #         inverse_of: :host,
-        #         dependent: :destroy
-
-        # scoped_search on: :passwordstate_server_id,
-        #               relation: :passwordstate_facet,
-        #               rename: :passwordstate_server,
-        #               complete_value: true,
-        #               only_explicit: true
-
-        after_update :ensure_cmdb_entry
-        before_destroy :remove_cmdb_entry
-      end
+    included do
+      after_save :ensure_cmdb_entry
+      before_destroy :remove_cmdb_entry
     end
 
     def liudesk_cmdb_facet!(**attrs)
@@ -114,7 +99,7 @@ module ForemanLiudeskCMDB
       # hw.blah = blah if blah_changed?
       # hw.save! if hw.changed?
 
-      # FIXME: This is ugly, should attempt assign elsewhere - service probably
+      # FIXME: This is ugly, should attempt assign elsewhere
       unless liudesk_cmdb_facet.asset_id
         reset_asset_id = true
         liudesk_cmdb_facet.asset_id = fqdn
@@ -137,7 +122,10 @@ module ForemanLiudeskCMDB
       asset.update_attributes(**cmdb_asset_info)
       asset.patch! if asset.changed?
 
-      liudesk_cmdb_facet.save! if liudesk_cmdb_facet.changed?
+      return true unless liudesk_cmdb_facet.changed?
+
+      liudesk_cmdb_facet.full_sync_at = Time.now
+      liudesk_cmdb_facet.save!
 
       true
     rescue StandardError => e
@@ -154,7 +142,7 @@ module ForemanLiudeskCMDB
       # XXX Rename before deprecation to avoid collision
       # This is temporary until deprecation supports name storage
       asset.identifier += "-depr-#{Time.now.to_i}"
-      asset.save!
+      asset.patch!
 
       asset.destroy
     rescue StandardError => e
