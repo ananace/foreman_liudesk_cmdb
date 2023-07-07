@@ -10,7 +10,7 @@ module ForemanLiudeskCMDB
       allow :asset_type
     end
 
-    include Facets::Base
+    include Facets::HostgroupFacet
 
     belongs_to :liudesk_cmdb_server,
                class_name: "LiudeskCMDBServer",
