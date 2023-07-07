@@ -75,8 +75,7 @@ module ForemanLiudeskCMDB
       info = cmdb_hardware_search
       info.merge!(
         make: facts["dmi::manufacturer"] || "N/A",
-        model: facts["dmi::product::name"],
-        hostname: name
+        model: facts["dmi::product::name"]
       )
 
       info[:mac_and_network_access_roles] = [mac: "", networkAccessRole: "None"] if create
