@@ -9,7 +9,7 @@ class AddLiudeskCmdb < ActiveRecord::Migration[6.1]
       t.string :description, limit: 255
       t.string :url, null: false, limit: 255
 
-      t.string :apikey, null: false, limit: 64
+      t.string :apikey, null: false, limit: 255
 
       t.timestamps null: false
     end
