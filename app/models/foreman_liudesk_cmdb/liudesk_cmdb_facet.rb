@@ -12,10 +12,6 @@ module ForemanLiudeskCMDB
 
     include Facets::Base
 
-    belongs_to :liudesk_cmdb_server,
-               class_name: "LiudeskCMDBServer",
-               inverse_of: :liudesk_cmdb_facets
-
     validates_lengths_from_database
 
     validates :host, presence: true, allow_blank: false
@@ -40,12 +36,39 @@ module ForemanLiudeskCMDB
       asset_type.to_s != "server"
     end
 
-    def asset(thin: false)
-      return unless asset_id
-
-      liudesk_cmdb_server.get_asset(asset_model_type, asset_id, thin: thin)
+    def asset_parameters
+      ForemanLiudeskCMDB::AssetParameters.call(host)
     end
 
+    def cached_asset_parameters
+      ForemanLiudeskCMDB::CachedAssetParameters.call(host)
+    end
+
+    def asset_params_diff
+      ForemanLiudeskCMDB::AssetParameterDifference.call(host)
+    end
+
+    def asset_will_change?
+      asset_params_diff.any?
+    end
+
+    def asset?
+      !asset_id.nil?
+    end
+
+    def asset
+      return unless asset_id
+
+      liudesk_cmdb_server.get_asset(asset_model_type, asset_id)
+    end
+
+    def hardware
+      return unless hardware_id
+
+      liudesk_cmdb_server.get_asset(:hardware_v1, hardware_id)
+    end
+
+    # XXX REMOVING
     def asset!(thin: false)
       return asset(thin: thin) if asset_id
       raise "Missing hardware ID" unless hardware_id
@@ -67,26 +90,20 @@ module ForemanLiudeskCMDB
       new_asset
     end
 
-    def hardware(thin: false)
-      return unless hardware_id
-
-      liudesk_cmdb_server.get_asset(:hardware_v1, hardware_id, thin: thin)
-    end
-
     def hardware!(thin: false)
       return hardware(thin: thin) if hardware_id
 
       if host.cmdb_hardware_search.empty?
         hw = []
       else
-        hw = liudesk_cmdb_server.find_asset(:hardware_v1, **host.cmdb_hardware_search)
+        hw = liudesk_cmdb_server.find_asset(:hardware_v1, **hardware_search_parameters)
         raise "Found multiple valid hardwares" if hw.count > 1
       end
 
       hw = if hw.count == 1
              hw.first
            else
-             liudesk_cmdb_server.create_asset(:hardware_v1, **host.cmdb_hardware_info(create: true))
+             liudesk_cmdb_server.create_asset(:hardware_v1, **hardware_parameters(create: true))
            end
 
       self.hardware_id = hw.identifier

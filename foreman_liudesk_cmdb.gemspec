@@ -14,7 +14,8 @@ Gem::Specification.new do |spec|
   spec.license     = "GPL-3.0"
   spec.required_ruby_version = ">= 2.7.0"
 
-  spec.files = Dir["{app,config,db,lib}/**/*.{rake,rb}"] + %w[LICENSE.txt README.md]
+  spec.files = Dir["{app,config,db,lib}/**/*.{erb,rake,rb}"] + %w[LICENSE.txt README.md]
 
+  spec.add_dependency "deface"
   spec.add_dependency "liudesk_cmdb"
 end

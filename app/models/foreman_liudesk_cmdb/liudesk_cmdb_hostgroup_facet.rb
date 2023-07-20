@@ -12,10 +12,6 @@ module ForemanLiudeskCMDB
 
     include Facets::HostgroupFacet
 
-    belongs_to :liudesk_cmdb_server,
-               class_name: "LiudeskCMDBServer",
-               inverse_of: :liudesk_cmdb_hostgroup_facets
-
     validates_lengths_from_database
 
     validates :hostgroup, presence: true, allow_blank: false
@@ -23,7 +19,7 @@ module ForemanLiudeskCMDB
 
     class << self
       def attributes_to_inherit
-        @attributes_to_inherit ||= attribute_names - %w[id created_at updated_at hostgroup_id]
+        @attributes_to_inherit ||= attribute_names - %w[id hostgroup_id created_at updated_at]
       end
     end
 

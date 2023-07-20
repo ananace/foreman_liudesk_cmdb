@@ -1,55 +1,62 @@
 <%-
   item = %w[hosts discovered_hosts].include?(controller_name) ? @host : @hostgroup
-  facet = item.try(:passwordstate_facet)
+  facet = item&.liudesk_cmdb_facet
 
-  if !(item.persisted? rescue false)
-    hostgroup = @hostgroup || @host.hostgroup
+  inherited = false
+  if !item&.persisted?
+    hostgroup = @hostgroup || @host&.hostgroup
     inherited = facet.nil?
-    inherited ||= true if hostgroup&.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])&.any?
+    inherited ||= true if hostgroup&.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])&.any?
 
-    facet ||= item.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:passwordstate_facet])) if inherited && hostgroup
+    facet ||= item&.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])) if inherited && hostgroup
   end
 -%>
 
 <%= fields_for item do |f| %>
 <%= f.fields_for 'liudesk_cmdb_facet_attributes' do |f| %>
-  <%-
+<%-
+    servers = []
     begin
       servers = LiudeskCMDBServer.all.map do |server|
-        name = "#{server.name} - #{server.url}"
-        name += " (not available)" unless server.test_connection
-        [ server.id, name ]
+        [ server.id, server.name ]
       end
     rescue StandardError => e
-  -%>
+-%>
 <!--
 Errors occured during rendering;
 <%= e.class %>: <%= e %>
 <%= e.backtrace.join "\n" %>
 -->
-  <%-
-      servers = []
+<%-
     end
-    server_id = facet.try :liudesk_cmdb_server_id rescue nil
-    cmdb_client = facet.try :asset_type rescue nil
-    cmdb_client = true if cmdb_client == :client
-  -%>
-  <%= select_f f, :liudesk_cmdb_server_id, servers, :first, :last,
-    { include_blank: true,
-      selected: server_id,
-      # disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
-      # disable_button_enabled: inherited,
-    },
-    { disabled: servers.empty?,
-      help_inline: :indicator,
-      label: _('CMDB Asset Store'),
-      label_help_options: { data: { placement: 'top' } }
-    }
-  %>
 
-  <%= add_label { label: _('Asset Type') }, f, { } %>
-  <%= radio_button_f f, :asset_type_meta, value: cmdb_client, text: "Client", disabled: servers.empty? %>
-  <%= radio_button_f f, :asset_type_meta, value: !cmdb_client, text: "Server", disabled: servers.empty? %>
-<% end -%>
-<% end -%>
-
+    server_id = facet&.liudesk_cmdb_server_id
+    asset_type = facet&.asset_type
+-%>
+<%= select_f(f, :liudesk_cmdb_server_id, servers, :first, :last,
+      { include_blank: true,
+        selected: server_id,
+        disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
+        disable_button_enabled: inherited,
+      },
+      { disabled: servers.empty?,
+        help_inline: :indicator,
+        label: _('CMDB Asset Storage Location'),
+        label_help_options: { data: { placement: 'top' } },
+      })
+%>
+<%= select_f(f, :asset_type, [ ['server', 'Server'], ['client', 'Client'] ], :first, :last,
+      { include_blank: true,
+        selected: asset_type,
+        disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
+        disable_button_enabled: inherited,
+      },
+      { help_inline: :indicator,
+        label: _('CMDB Asset Type'),
+        label_help_options: { data: { placement: 'top' } },
+      })
+%>
+<%-
+  end
+end
+-%>

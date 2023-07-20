@@ -8,8 +8,7 @@ module ForemanLiudeskCMDB
     extend ActiveSupport::Concern
 
     included do
-      after_save :ensure_cmdb_entry
-      before_destroy :remove_cmdb_entry
+      include ::Orchestration::LiudeskCMDB
     end
 
     def liudesk_cmdb_facet!(**attrs)
