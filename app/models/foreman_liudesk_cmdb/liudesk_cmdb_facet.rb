@@ -36,6 +36,27 @@ module ForemanLiudeskCMDB
       asset_type.to_s != "server"
     end
 
+    def asset_parameter_keys
+      base = %i[
+        hostname network_access_role
+        operating_system_type operating_system operating_system_install_date
+        management_system management_system_id
+      ]
+      base + if client?
+               %i[certificate_information network_certificate_ca]
+             else
+               %i[foreman_url]
+             end
+    end
+
+    def hardware_parameter_keys
+      %i[
+        make model
+        mac_and_network_access_roles
+        serial_number bios_uuid
+      ]
+    end
+
     def asset_parameters
       ForemanLiudeskCMDB::AssetParameters.call(host)
     end
@@ -48,7 +69,9 @@ module ForemanLiudeskCMDB
       ForemanLiudeskCMDB::AssetParameterDifference.call(host)
     end
 
-    def asset_will_change?
+    def asset_will_change?(only: nil)
+      return asset_params_diff[only].any? if only
+
       asset_params_diff.any?
     end
 

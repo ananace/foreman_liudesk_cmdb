@@ -8,7 +8,7 @@ module ForemanLiudeskCMDB
         include ::Interactor
 
         around do |interactor|
-          interactor.call unless context.hardware
+          interactor.call if search_params.any? && !context.hardware
         end
 
         def call
@@ -21,13 +21,11 @@ module ForemanLiudeskCMDB
 
         private
 
-        delegate :host, to: :context
+        delegate :cmdb_params, to: :context
 
         def search_params
-          {
-            serial_number: host.facts["dmi::product::serial_number"] || host.facts["serialnumber"],
-            bios_uuid: host.facts["dmi::product::uuid"] || host.facts["uuid"]
-          }.compact
+          cmdb_params[:hardware].slice(:bios_uuid, :serial_number)
+          # .merge(mac: cmdb_params.dig(:hardware, :mac_and_network_access_roles).map { |nmap| nmap[:mac] })
         end
       end
     end

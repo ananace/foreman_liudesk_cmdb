@@ -18,84 +18,81 @@ module ForemanLiudeskCMDB
       }
     end
 
-    def asset_param_sources
-      params = %i[hostname operating_system]
-      params << :management_system if host.managed?
-      params << :network_access if \
-        !host.persisted? || !host.liudesk_cmdb_facet&.persisted? || host.liudesk_cmdb_facet&.client?
-      params
-    end
-
-    def asset_params
-      asset_param_sources.map { |param| send(param) }.inject({}, :merge)
-    end
-
-    def hardware_param_sources
-      %i[manufacturer_and_model bios_info hardware_networking]
-    end
-
-    def hardware_params
-      hardware_param_sources.map { |param| send(param) }.inject({}, :merge)
-    end
-
     private
 
     attr_accessor :host
 
-    def hostname
-      {
-        hostname: host.name
-      }
+    def asset_params
+      host.liudesk_cmdb_facet.asset_parameter_keys.map { |param| send("find_asset_#{param}") }.inject({}, :merge)
     end
 
-    def operating_system
-      {
-        operating_system: host.os&.title || "N/A",
-        operating_system_type: host.os&.name || "N/A",
-        operating_system_install_date: host.installed_at&.round
-      }.compact
+    def hardware_params
+      host.liudesk_cmdb_facet.hardware_parameter_keys.map { |param| send("find_hardware_#{param}") }.inject({}, :merge)
     end
 
-    def management_system
-      {
-        management_system: "ITI-Foreman",
-        management_system_id: "#{SETTINGS[:fqdn]}/#{id}",
-        foreman_link: "https://#{SETTINGS[:fqdn]}/hosts/#{fqdn}"
-      }
+    def find_asset_hostname
+      { hostname: host.name }
     end
 
-    def network_access
-      params = {
-        network_access_role: host.liudesk_cmdb_facet&.asset? ? nil : "None"
-      }
-      return params.compact unless host.liudesk_cmdb_facet&.client?
-
-      params[:certificate_information] = host.certname
-      params[:network_certificate_ca] = "PUPPETCA"
-      params.compact
+    def find_asset_network_access_role
+      { network_access_role: host.liudesk_cmdb_facet.asset? ? nil : "None" }.compact
     end
 
-    def manufacturer_and_model
-      make = host.facts["dmi::manufacturer"] || host.facts["manufacturer"] || "N/A"
+    def find_asset_operating_system
+      { operating_system: host.os&.title || "N/A" }
+    end
+
+    def find_asset_operating_system_type
+      { operating_system: host.os&.name || "N/A" }
+    end
+
+    def find_asset_operating_install_date
+      { operating_system: host.installed_at&.round }.compact
+    end
+
+    def find_asset_management_system
+      { management_system: host.managed? ? "ITI-Foreman" : nil }.compact
+    end
+
+    def find_asset_management_system_id
+      { management_system_id: host.managed? ? "#{SETTINGS[:fqdn]}/#{id}" : nil }.compact
+    end
+
+    def find_asset_foreman_url
+      { foreman_link: host.managed? ? "https://#{SETTINGS[:fqdn]}/hosts/#{fqdn}" : nil }.compact
+    end
+
+    def find_asset_certificate_information
+      { certificate_information: host.certname }
+    end
+
+    def find_asset_network_certificate_ca
+      { network_certificate_ca: "PUPPETCA" }
+    end
+
+    def find_hardware_make
+      { make: host.facts["dmi::manufacturer"] || host.facts["manufacturer"] || "N/A" }
+    end
+
+    def find_hardware_model
+      make = find_hardware_make[:make]
       model = host.facts["dmi::product::name"] || host.facts["productname"]
 
       model = model&.sub(make, "")&.strip if model&.start_with? make
       model = "N/A" if model.nil? || model.empty?
 
-      {
-        make: make,
-        model: model
-      }
+      { model: model }
     end
 
-    def bios_info
-      {
-        serial_number: host.facts["dmi::product::serial_number"] || host.facts["serialnumber"],
-        bios_uuid: host.facts["dmi::product::uuid"] || host.facts["uuid"]
-      }.compact
+    def find_hardware_bios_uuid
+      { bios_uuid: host.facts["dmi::product::uuid"] || host.facts["uuid"] }.compact
     end
 
-    def hardware_networking
+    def find_hardware_serial_number
+      { serial_number: host.facts["dmi::product::serial_number"] || host.facts["serialnumber"] }.compact
+    end
+
+    def find_hardware_mac_and_network_access_roles
       {
         mac_and_network_access_roles: host.interfaces.map do |iface|
           next unless iface.mac

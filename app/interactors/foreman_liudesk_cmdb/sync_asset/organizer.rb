@@ -7,7 +7,13 @@ module ForemanLiudeskCMDB
       include ::Interactor::Organizer
 
       before do
+        context.cached_params = facet.cached_asset_parameters
+        context.cmdb_params = facet.asset_parameters
         context.raw_data = {}
+      end
+
+      after do
+        context.raw_data[:asset] = context.asset.raw_data!
       end
 
       organize SyncAsset::SyncHardware::Organizer,
