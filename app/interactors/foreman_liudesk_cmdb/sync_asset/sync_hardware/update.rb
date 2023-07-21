@@ -3,8 +3,8 @@
 module ForemanLiudeskCMDB
   module SyncAsset
     module SyncHardware
-      # Attaches a hardware object to the context is one is available
-      class Create
+      # Applies any pending changes to the asset hardware object
+      class Update
         include ::Interactor
 
         around do |interactor|

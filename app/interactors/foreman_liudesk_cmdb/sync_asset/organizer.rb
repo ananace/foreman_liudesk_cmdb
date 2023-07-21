@@ -13,11 +13,11 @@ module ForemanLiudeskCMDB
       end
 
       after do
-        context.raw_data[:asset] = context.asset.raw_data!
+        context.raw_data[:asset] = context.asset.raw_data! if context.asset.retrieved?
       end
 
       organize SyncAsset::SyncHardware::Organizer,
-               SyncAsset::Validate,
+               # SyncAsset::Validate,
                SyncAsset::FindThin,
                SyncAsset::Find,
                SyncAsset::Create,

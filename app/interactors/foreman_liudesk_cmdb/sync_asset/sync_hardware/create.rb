@@ -12,7 +12,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::API.create_asset(:hardware_v1, **cmbd_params[:hardware])
+          context.hardware = ForemanLiudeskCMDB::API.create_asset(:hardware_v1, **cmdb_params[:hardware])
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")

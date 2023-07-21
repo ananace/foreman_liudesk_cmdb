@@ -8,11 +8,11 @@ module ForemanLiudeskCMDB
         include ::Interactor::Organizer
 
         after do
-          context.raw_data[:hardware] = context.hardware.raw_data!
+          context.raw_data[:hardware] = context.hardware.raw_data! if context.hardware.retrieved?
         end
 
-        organize SyncHardware::Validate,
-                 SyncHardware::FindThin,
+        # SyncHardware::Validate,
+        organize SyncHardware::FindThin,
                  SyncHardware::Find,
                  SyncHardware::Create,
                  SyncHardware::Update
