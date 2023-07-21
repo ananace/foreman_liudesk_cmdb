@@ -17,5 +17,6 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,db,lib}/**/*.{erb,rake,rb}"] + %w[LICENSE.txt README.md]
 
   spec.add_dependency "deface"
+  spec.add_dependency "interactor", "~> 3"
   spec.add_dependency "liudesk_cmdb"
 end
