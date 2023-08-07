@@ -70,6 +70,7 @@ module ForemanLiudeskCMDB
     end
 
     def asset_will_change?(only: nil)
+      return true if asset_type_changed?
       return asset_params_diff[only].any? if only
 
       asset_params_diff.any?

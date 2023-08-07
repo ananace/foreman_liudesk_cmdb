@@ -11,7 +11,6 @@ module ForemanLiudeskCMDB
           context.raw_data[:hardware] = context.hardware.raw_data! if context.hardware.retrieved?
         end
 
-        # SyncHardware::Validate,
         organize SyncHardware::FindThin,
                  SyncHardware::Find,
                  SyncHardware::Create,

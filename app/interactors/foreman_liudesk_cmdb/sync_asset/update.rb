@@ -24,11 +24,13 @@ module ForemanLiudeskCMDB
 
       private
 
+      SKIP_UPDATE = %i[network_access_role].freeze
+
       delegate :cached_params, :cmdb_params, :asset, to: :context
 
       def update_params
         params = context.host.liudesk_cmdb_facet.asset_parameter_keys
-        params.delete(:network_access_role)
+        SKIP_UPDATE.each { |skip| params.delete(skip) }
         params
       end
 
