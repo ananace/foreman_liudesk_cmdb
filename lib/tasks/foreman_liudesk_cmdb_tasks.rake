@@ -37,6 +37,14 @@ namespace :test do
     t.verbose = true
     t.warning = false
   end
+
+  namespace :foreman_liudesk_cmdb do
+    task :coverage do
+      ENV["COVERAGE"] = "1"
+
+      Rake::Task["test:foreman_liudesk_cmdb"].invoke
+    end
+  end
 end
 
 namespace :foreman_liudesk_cmdb do
@@ -57,3 +65,4 @@ namespace :foreman_liudesk_cmdb do
 end
 
 Rake::Task[:test].enhance ["test:foreman_liudesk_cmdb"]
+# Rake::Task[:coverage].enhance ["coverage:foreman_liudesk_cmdb"]

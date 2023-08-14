@@ -15,7 +15,7 @@ module Orchestration
     protected
 
     def cmdb_orchestration?
-      Setting[:liudesk_cmdb_orchestration_enabled] && asset_will_change?
+      Setting[:liudesk_cmdb_orchestration_enabled] && liudesk_cmdb_facet && asset_will_change?
     end
 
     def queue_cmdb_sync

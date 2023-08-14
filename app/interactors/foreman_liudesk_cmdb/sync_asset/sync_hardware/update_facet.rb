@@ -8,11 +8,11 @@ module ForemanLiudeskCMDB
         include ::Interactor
 
         around do |interactor|
-          interactor.call if hardware && hardware.id != facet.hardware_id
+          interactor.call if hardware && hardware.identifier != facet.hardware_id
         end
 
         def call
-          facet.update hardware_id: hardware.id
+          facet.update hardware_id: hardware.identifier
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")
