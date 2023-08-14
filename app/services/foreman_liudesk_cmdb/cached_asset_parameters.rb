@@ -35,7 +35,7 @@ module ForemanLiudeskCMDB
     def asset_params
       return {} unless raw_data.key? :asset
 
-      asset_klass = ForemanLiudeskCMDB::API.get_asset_type(asset_type_param || :server_v1)
+      asset_klass = ForemanLiudeskCMDB::API.get_asset_type(asset_type_param || facet.asset_model_type || :server_v1)
 
       params = asset_klass.convert_cmdb_to_ruby(raw_data[:asset] || {})
       params.slice(*host.liudesk_cmdb_facet.asset_parameter_keys)
