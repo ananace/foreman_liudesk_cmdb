@@ -52,7 +52,7 @@ class UpdateAssetTest < ActiveSupport::TestCase
         os.minor = "0"
         os.title = "Debian 10.0"
       end
-      host.installed_at = Time.new(2022, 1, 1).utc
+      host.installed_at = Time.utc(2021, 12, 31, 23, 0, 0)
       host.managed = true
       host.id = 1
 
