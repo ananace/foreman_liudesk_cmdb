@@ -14,7 +14,9 @@ module ForemanLiudeskCMDB
     def call
       {
         asset: asset_params,
-        hardware: hardware_params
+        asset_type: host.liudesk_cmdb_facet.asset_model_type,
+        hardware: hardware_params,
+        hardware_type: host.liudesk_cmdb_facet.hardware_model_type
       }
     end
 
@@ -35,7 +37,12 @@ module ForemanLiudeskCMDB
     end
 
     def find_asset_network_access_role
-      { network_access_role: host.liudesk_cmdb_facet.asset? ? nil : "None" }.compact
+      role = host.liudesk_cmdb_facet.network_role
+      role = nil if role&.empty?
+
+      {
+        network_access_role: role || (host.liudesk_cmdb_facet.asset? ? nil : "None")
+      }.compact
     end
 
     def find_asset_operating_system
@@ -43,11 +50,11 @@ module ForemanLiudeskCMDB
     end
 
     def find_asset_operating_system_type
-      { operating_system: host.os&.name || "N/A" }
+      { operating_system_type: host.os&.name || "N/A" }
     end
 
-    def find_asset_operating_install_date
-      { operating_system: host.installed_at&.round }.compact
+    def find_asset_operating_system_install_date
+      { operating_system_install_date: host.installed_at&.round }.compact
     end
 
     def find_asset_management_system
@@ -55,11 +62,11 @@ module ForemanLiudeskCMDB
     end
 
     def find_asset_management_system_id
-      { management_system_id: host.managed? ? "#{SETTINGS[:fqdn]}/#{id}" : nil }.compact
+      { management_system_id: host.managed? ? "#{SETTINGS[:fqdn]}/#{host.id}" : nil }.compact
     end
 
-    def find_asset_foreman_url
-      { foreman_link: host.managed? ? "https://#{SETTINGS[:fqdn]}/hosts/#{fqdn}" : nil }.compact
+    def find_asset_foreman_link
+      { foreman_link: host.managed? ? "https://#{SETTINGS[:fqdn]}/hosts/#{host.fqdn}" : nil }.compact
     end
 
     def find_asset_certificate_information

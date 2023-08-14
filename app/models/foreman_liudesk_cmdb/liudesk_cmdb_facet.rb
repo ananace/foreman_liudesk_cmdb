@@ -32,6 +32,10 @@ module ForemanLiudeskCMDB
       end
     end
 
+    def hardware_model_type
+      :hardware_v1
+    end
+
     def client?
       asset_type.to_s != "server"
     end
@@ -45,7 +49,7 @@ module ForemanLiudeskCMDB
       base + if client?
                %i[certificate_information network_certificate_ca]
              else
-               %i[foreman_url]
+               %i[foreman_link]
              end
     end
 
@@ -89,49 +93,7 @@ module ForemanLiudeskCMDB
     def hardware
       return unless hardware_id
 
-      liudesk_cmdb_server.get_asset(:hardware_v1, hardware_id)
-    end
-
-    # XXX REMOVING
-    def asset!(thin: false)
-      return asset(thin: thin) if asset_id
-      raise "Missing hardware ID" unless hardware_id
-
-      new_asset = nil
-      begin
-        new_asset = liudesk_cmdb_server.get_asset(asset_model_type, host.name)
-      rescue LiudeskCMDB::NotAcceptableError
-        # Asset already exists, but as a different type
-        raise
-      rescue LiudeskCMDB::Error
-        # Asset not found, create a new one
-      end
-
-      new_asset ||= liudesk_cmdb_server.create_asset(
-        asset_model_type, **host.cmdb_asset_info(create: true).merge(hardware_id: hardware_id)
-      )
-      self.asset_id = new_asset.identifier
-      new_asset
-    end
-
-    def hardware!(thin: false)
-      return hardware(thin: thin) if hardware_id
-
-      if host.cmdb_hardware_search.empty?
-        hw = []
-      else
-        hw = liudesk_cmdb_server.find_asset(:hardware_v1, **hardware_search_parameters)
-        raise "Found multiple valid hardwares" if hw.count > 1
-      end
-
-      hw = if hw.count == 1
-             hw.first
-           else
-             liudesk_cmdb_server.create_asset(:hardware_v1, **hardware_parameters(create: true))
-           end
-
-      self.hardware_id = hw.identifier
-      hw
+      liudesk_cmdb_server.get_asset(hardware_model_type, hardware_id)
     end
   end
 end

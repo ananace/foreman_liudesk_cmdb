@@ -1,0 +1,11 @@
+{
+  "hardware_type": "hardware_v1",
+  "hardware": {
+    "guid": "example_hardware_id"
+  },
+  "asset_type": "server_v1",
+  "asset": {
+    "hostname": "hostname.localhost.localdomain",
+    "hardware_id": "example_hardware_id"
+  }
+}

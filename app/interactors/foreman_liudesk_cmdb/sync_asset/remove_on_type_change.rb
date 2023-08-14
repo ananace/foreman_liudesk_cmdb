@@ -7,8 +7,9 @@ module ForemanLiudeskCMDB
       include ::Interactor
 
       around do |interactor|
-        interactor.call if context.asset &&
-                           !context.asset.is_a?(ForemanLiudeskCMDB::API.get_asset_type(facet.asset_model_type))
+        interactor.call if old_asset_type &&
+                           context.asset &&
+                           old_asset_type != facet.asset_model_type
       end
 
       def call
@@ -32,6 +33,10 @@ module ForemanLiudeskCMDB
 
       def facet
         host.liudesk_cmdb_facet
+      end
+
+      def old_asset_type
+        facet.cached_asset_parameters[:asset_type]
       end
     end
   end

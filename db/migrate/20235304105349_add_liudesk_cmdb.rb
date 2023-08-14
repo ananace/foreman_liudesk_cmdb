@@ -7,6 +7,8 @@ class AddLiudeskCmdb < ActiveRecord::Migration[6.1]
       t.integer :host_id, null: false, index: true
 
       t.string :asset_type, null: false
+      t.string :network_role, null: true
+
       t.string :asset_id, null: true
       t.string :hardware_id, null: true
 
@@ -21,6 +23,7 @@ class AddLiudeskCmdb < ActiveRecord::Migration[6.1]
       t.integer :hostgroup_id, null: false, index: true
 
       t.string :asset_type, null: false
+      t.string :network_role, null: true
 
       t.timestamps null: false
     end

@@ -12,11 +12,12 @@ module ForemanLiudeskCMDB
 
       def call
         asset_params.slice(*update_params).each do |key, value|
-          asset.send("#{key}=".to_sym, value) if asset_hardware_params[key] != value
+          asset.send("#{key}=".to_sym, value) if cached_asset_params[key] != value
         end
 
         asset.patch! if asset.changed?
       rescue StandardError => e
+        puts "Update failed - #{e.class}: #{e}\n#{e.backtrace}"
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
         context.fail!(error: "#{self.class}: #{e}")
@@ -24,13 +25,16 @@ module ForemanLiudeskCMDB
 
       private
 
-      SKIP_UPDATE = %i[network_access_role].freeze
+      delegate :cached_params, :cmdb_params, :asset, :host, to: :context
 
-      delegate :cached_params, :cmdb_params, :asset, to: :context
+      def facet
+        host.liudesk_cmdb_facet
+      end
 
       def update_params
-        params = context.host.liudesk_cmdb_facet.asset_parameter_keys
-        SKIP_UPDATE.each { |skip| params.delete(skip) }
+        params = facet.asset_parameter_keys
+        params.delete :network_access_role if facet.network_role.nil? || facet.network_role.empty?
+
         params
       end
 

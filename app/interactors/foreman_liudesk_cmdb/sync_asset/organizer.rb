@@ -13,7 +13,10 @@ module ForemanLiudeskCMDB
       end
 
       after do
-        context.raw_data[:asset] = context.asset.raw_data! if context.asset.retrieved?
+        if context.asset&.retrieved?
+          context.raw_data[:asset] = context.asset.class.convert_ruby_to_cmdb context.asset.raw_data!
+          context.raw_data[:asset_type] = context.asset.class.name.split("::").last._cmdb_snake_case
+        end
       end
 
       organize SyncAsset::SyncHardware::Organizer,
@@ -21,7 +24,8 @@ module ForemanLiudeskCMDB
                SyncAsset::Find,
                SyncAsset::RemoveOnTypeChange,
                SyncAsset::Create,
-               SyncAsset::Update
+               SyncAsset::Update,
+               SyncAsset::UpdateFacet
 
       def call
         super

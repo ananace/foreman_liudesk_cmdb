@@ -11,7 +11,7 @@ module ForemanLiudeskCMDB
       end
 
       def call
-        context.asset = ForemanLiudeskCMDB::API.get_asset(facet.asset_type, facet.hardware_id, thin: true)
+        context.asset = ForemanLiudeskCMDB::API.get_asset(asset_model_type, facet.asset_id, thin: true)
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
@@ -24,6 +24,10 @@ module ForemanLiudeskCMDB
 
       def facet
         host.liudesk_cmdb_facet
+      end
+
+      def asset_model_type
+        facet.cached_asset_parameters[:asset_type] || facet.asset_model_type
       end
     end
   end

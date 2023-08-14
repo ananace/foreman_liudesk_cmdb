@@ -2,16 +2,16 @@
 
 module ForemanLiudeskCMDB
   module SyncAsset
-    # Creates and attaches an asset object to the context is one is available
-    class Create
+    # Applies any pending asset id changes to the facet
+    class UpdateFacet
       include ::Interactor
 
       around do |interactor|
-        interactor.call if facet.hardware_id && !facet.asset_id
+        interactor.call if asset && asset.id != facet.asset_id
       end
 
       def call
-        context.asset = ForemanLiudeskCMDB::API.create_asset(facet.asset_model_type, **params)
+        facet.update asset_id: asset.id
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
@@ -20,14 +20,10 @@ module ForemanLiudeskCMDB
 
       private
 
-      delegate :host, to: :context
+      delegate :host, :asset, to: :context
 
       def facet
         host.liudesk_cmdb_facet
-      end
-
-      def params
-        context.cmdb_params[:asset].merge(hardware_id: facet.hardware_id)
       end
     end
   end

@@ -23,6 +23,6 @@ module ForemanLiudeskCMDB
       end
     end
 
-    inherit_attributes(*%w[asset_type])
+    inherit_attributes(*%w[asset_type network_role])
   end
 end

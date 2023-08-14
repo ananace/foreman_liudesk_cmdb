@@ -4,7 +4,7 @@ module ForemanLiudeskCMDB
   # Helper class for holding a CMDB API client
   class API
     def self.client
-      @client ||= LiudeskCMDB::Client.new Settings[:liudesk_cmdb_url], subscription_key: Settings[:liudesk_cmdb_token]
+      @client ||= LiudeskCMDB::Client.new Setting[:liudesk_cmdb_url], subscription_key: Setting[:liudesk_cmdb_token]
     end
 
     def self.get_asset_type(asset_type)
@@ -15,7 +15,7 @@ module ForemanLiudeskCMDB
       klass = get_asset_type(asset_type)
       return klass.new(client, asset_id) if thin
 
-      klass.get connection, asset_id
+      klass.get client, asset_id
     end
 
     def self.find_asset(asset_type, **search)

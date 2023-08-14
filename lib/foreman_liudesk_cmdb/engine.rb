@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
+require "interactor"
+require "liudesk_cmdb"
+
 module ForemanLiudeskCMDB
   # Plugin engine
   class Engine < ::Rails::Engine
     engine_name "foreman_liudesk_cmdb"
 
-    config.autoload_paths += Dir["#{config.root}/app/models/concerns"]
     config.autoload_paths += Dir["#{config.root}/app/interactors"]
-    # config.autoload_paths += Dir["#{config.root}/app/services"]
 
     initializer "foreman_liudesk_cmdb.load_app_instance_data" do |app|
       ForemanLiudeskCMDB::Engine.paths["db/migrate"].existent.each do |path|

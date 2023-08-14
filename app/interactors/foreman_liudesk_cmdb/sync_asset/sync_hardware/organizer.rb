@@ -8,13 +8,17 @@ module ForemanLiudeskCMDB
         include ::Interactor::Organizer
 
         after do
-          context.raw_data[:hardware] = context.hardware.raw_data! if context.hardware.retrieved?
+          if context.hardware&.retrieved?
+            context.raw_data[:hardware] = context.hardware.class.convert_ruby_to_cmdb context.hardware.raw_data!
+            context.raw_data[:hardware_type] = context.hardware.class.name.split("::").last._cmdb_snake_case
+          end
         end
 
         organize SyncHardware::FindThin,
                  SyncHardware::Find,
                  SyncHardware::Create,
-                 SyncHardware::Update
+                 SyncHardware::Update,
+                 SyncHardware::UpdateFacet
       end
     end
   end

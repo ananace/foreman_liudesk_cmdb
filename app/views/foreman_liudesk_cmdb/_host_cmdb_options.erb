@@ -14,40 +14,9 @@
 
 <%= fields_for item do |f| %>
 <%= f.fields_for 'liudesk_cmdb_facet_attributes' do |f| %>
-<%-
-    servers = []
-    begin
-      servers = LiudeskCMDBServer.all.map do |server|
-        [ server.id, server.name ]
-      end
-    rescue StandardError => e
--%>
-<!--
-Errors occured during rendering;
-<%= e.class %>: <%= e %>
-<%= e.backtrace.join "\n" %>
--->
-<%-
-    end
-
-    server_id = facet&.liudesk_cmdb_server_id
-    asset_type = facet&.asset_type
--%>
-<%= select_f(f, :liudesk_cmdb_server_id, servers, :first, :last,
-      { include_blank: true,
-        selected: server_id,
-        disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
-        disable_button_enabled: inherited,
-      },
-      { disabled: servers.empty?,
-        help_inline: :indicator,
-        label: _('CMDB Asset Storage Location'),
-        label_help_options: { data: { placement: 'top' } },
-      })
-%>
 <%= select_f(f, :asset_type, [ ['server', 'Server'], ['client', 'Client'] ], :first, :last,
       { include_blank: true,
-        selected: asset_type,
+        selected: facet&.asset_type,
         disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
         disable_button_enabled: inherited,
       },
@@ -56,6 +25,25 @@ Errors occured during rendering;
         label_help_options: { data: { placement: 'top' } },
       })
 %>
+<%# text_f lacks inherit/disable_button functionality %>
+<%= field(f, :network_role) do
+      input_part = f.text_field :network_role,
+                                class: "form-control",
+                                disabled: inherited,
+                                help_inline: :indicator,
+                                label: _('CMDB Network Role'),
+                                label_help_options: { data: { placement: 'top' } }
+      button_part = content_tag :span, class: "input-group-btn" do
+        content_tag :button, _(HostsAndHostgroupsHelper::INHERIT_TEXT), type: "button", href: "#",
+                    class: "form-control",
+                    name: "is_overridden_btn",
+                    onclick: "disableButtonToggle(this)",
+                    class: "btn btn-default btn-can-disable #{inherited ? "active" : ""}",
+                    data: { toggle: "button", explicit: false }
+      end
+
+      input_group input_part, button_part
+    end %>
 <%-
   end
 end
