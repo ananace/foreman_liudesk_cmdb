@@ -19,7 +19,7 @@ module ForemanLiudeskCMDB
     # rubocop:disable Metrics/BlockLength
     initializer "foreman_liudesk_cmdb.register_plugin", before: :finisher_hook do |_app|
       Foreman::Plugin.register :foreman_liudesk_cmdb do
-        requires_foreman ">= 3.7"
+        requires_foreman ">= 3.6"
 
         register_facet ForemanLiudeskCMDB::LiudeskCMDBFacet, :liudesk_cmdb_facet do
           configure_host do
