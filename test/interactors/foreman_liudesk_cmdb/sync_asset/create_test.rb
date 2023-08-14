@@ -41,7 +41,7 @@ class CreateAssetTest < ActiveSupport::TestCase
           hardwareID: hardware_id,
           operatingSystemType: "N/A",
           operatingSystem: "N/A"
-        }.to_json
+        }
       ).to_return(
         status: 201,
         body: {

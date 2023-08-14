@@ -102,13 +102,13 @@ module ForemanLiudeskCMDB
     def find_hardware_mac_and_network_access_roles
       {
         mac_and_network_access_roles: host.interfaces.map do |iface|
-          next unless iface.mac
+          next unless iface&.mac
 
           {
             mac: iface.mac&.upcase,
             networkAccessRole: host.liudesk_cmdb_facet&.asset? ? nil : "None"
           }.compact
-        end
+        end.compact
       }
     end
   end

@@ -108,7 +108,7 @@ class UpdateAssetTest < ActiveSupport::TestCase
         foremanLink: "https://#{SETTINGS[:fqdn]}/hosts/#{hostname}"
       }
       stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{asset.api_url}").with(
-        body: updated.to_json
+        body: updated
       ).to_return(
         status: 200,
         body: updated.merge(
