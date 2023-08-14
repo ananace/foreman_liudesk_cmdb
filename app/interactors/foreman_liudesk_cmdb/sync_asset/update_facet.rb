@@ -7,11 +7,11 @@ module ForemanLiudeskCMDB
       include ::Interactor
 
       around do |interactor|
-        interactor.call if asset && asset.id != facet.asset_id
+        interactor.call if asset && asset.identifier != facet.asset_id
       end
 
       def call
-        facet.update asset_id: asset.id
+        facet.update asset_id: asset.identifier
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
