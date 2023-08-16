@@ -12,7 +12,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::API.find_asset(:hardware_v1, **search_params).first
+          context.hardware = ForemanLiudeskCMDB::API.find_asset(facet.hardware_model_type, **search_params).first
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")
@@ -21,7 +21,11 @@ module ForemanLiudeskCMDB
 
         private
 
-        delegate :cmdb_params, to: :context
+        delegate :cmdb_params, :host, to: :context
+
+        def facet
+          host.liudesk_cmdb_facet
+        end
 
         def search_params
           cmdb_params[:hardware].slice(:bios_uuid, :serial_number)

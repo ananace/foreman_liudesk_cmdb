@@ -1,11 +1,17 @@
 {
   "hardware_type": "hardware_v1",
   "hardware": {
-    "guid": "example_hardware_id"
+    "guid": "example_hardware_id",
+    "make": "N/A",
+    "model": "N/A"
   },
   "asset_type": "server_v1",
   "asset": {
     "hostname": "hostname.localhost.localdomain",
-    "hardware_id": "example_hardware_id"
+    "hardware_id": "example_hardware_id",
+    "operating_system": "N/A",
+    "operating_system_type": "N/A",
+    "management_system": "ITI-Foreman",
+    "network_certificate_ca": "PUPPETCA"
   }
 }

@@ -50,6 +50,14 @@ class UpdateFacetTest < ActiveSupport::TestCase
 
       assert subject.success?
     end
+
+    it "handles errors correctly" do
+      host.liudesk_cmdb_facet.asset_id = nil
+
+      host.liudesk_cmdb_facet.expects(:update).raises(StandardError)
+
+      refute subject.success?
+    end
   end
 
   context "when asset id is changed" do
@@ -59,6 +67,14 @@ class UpdateFacetTest < ActiveSupport::TestCase
       host.liudesk_cmdb_facet.expects(:update).with(asset_id: asset_id)
 
       assert subject.success?
+    end
+
+    it "handles errors correctly" do
+      host.liudesk_cmdb_facet.asset_id = "#{hostname}-old"
+
+      host.liudesk_cmdb_facet.expects(:update).raises(StandardError)
+
+      refute subject.success?
     end
   end
 end

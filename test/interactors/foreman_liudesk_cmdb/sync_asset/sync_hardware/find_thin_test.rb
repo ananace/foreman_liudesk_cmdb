@@ -43,6 +43,13 @@ class FindThinHardwareTest < ActiveSupport::TestCase
       assert subject.success?
       assert_equal "testdata", subject.hardware.identifier
     end
+
+    it "handles errors correctly" do
+      ForemanLiudeskCMDB::API.expects(:get_asset).raises(StandardError)
+
+      refute subject.success?
+      refute subject.hardware
+    end
   end
 
   context "when hardware id is not assigned to the facet" do

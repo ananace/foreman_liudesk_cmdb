@@ -75,7 +75,7 @@ module ForemanLiudeskCMDB
 
     def asset_will_change?(only: nil)
       return true if asset_type_changed?
-      return asset_params_diff[only].any? if only
+      return (asset_params_diff[only] || {}).any? if only
 
       asset_params_diff.any?
     end
@@ -87,13 +87,17 @@ module ForemanLiudeskCMDB
     def asset
       return unless asset_id
 
-      liudesk_cmdb_server.get_asset(asset_model_type, asset_id)
+      ForemanLiudeskCMDB::API.get_asset(asset_model_type, asset_id)
+    end
+
+    def hardware?
+      !hardware_id.nil?
     end
 
     def hardware
       return unless hardware_id
 
-      liudesk_cmdb_server.get_asset(hardware_model_type, hardware_id)
+      ForemanLiudeskCMDB::API.get_asset(hardware_model_type, hardware_id)
     end
   end
 end

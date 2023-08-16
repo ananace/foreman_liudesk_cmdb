@@ -50,6 +50,14 @@ class UpdateFacetHardwareTest < ActiveSupport::TestCase
 
       assert subject.success?
     end
+
+    it "handles errors correctly" do
+      host.liudesk_cmdb_facet.hardware_id = nil
+
+      host.liudesk_cmdb_facet.expects(:update).raises(StandardError)
+
+      refute subject.success?
+    end
   end
 
   context "when hardware id is changed" do
@@ -59,6 +67,14 @@ class UpdateFacetHardwareTest < ActiveSupport::TestCase
       host.liudesk_cmdb_facet.expects(:update).with(hardware_id: hardware_id)
 
       assert subject.success?
+    end
+
+    it "handles errors correctly" do
+      host.liudesk_cmdb_facet.hardware_id = "bleh"
+
+      host.liudesk_cmdb_facet.expects(:update).raises(StandardError)
+
+      refute subject.success?
     end
   end
 end

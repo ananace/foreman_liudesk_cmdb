@@ -7,7 +7,7 @@ module Orchestration
 
     included do
       after_validation :queue_cmdb_sync, if: :cmdb_orchestration?
-      before_destroy :cmdb_archive_asset_blocking
+      before_destroy :cmdb_archive_asset_blocking, if: :cmdb_orchestration?
     end
 
     delegate :asset_will_change?, :asset_params_diff, to: :liudesk_cmdb_facet
@@ -15,7 +15,7 @@ module Orchestration
     protected
 
     def cmdb_orchestration?
-      Setting[:liudesk_cmdb_orchestration_enabled] && liudesk_cmdb_facet && asset_will_change?
+      Setting[:liudesk_cmdb_orchestration_enabled] && liudesk_cmdb_facet
     end
 
     def queue_cmdb_sync

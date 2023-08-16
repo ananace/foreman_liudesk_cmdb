@@ -119,5 +119,15 @@ class UpdateAssetTest < ActiveSupport::TestCase
       assert subject.success?
       assert_requested(stub_patch)
     end
+
+    it "handles errors correctly" do
+      stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{asset.api_url}").to_return(
+        status: 400,
+        body: {}.to_json
+      )
+
+      refute subject.success?
+      assert_requested(stub_patch)
+    end
   end
 end

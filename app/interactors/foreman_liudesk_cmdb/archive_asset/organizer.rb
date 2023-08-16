@@ -6,10 +6,10 @@ module ForemanLiudeskCMDB
     class Organizer
       include ::Interactor::Organizer
 
-      organize ArchiveAsset::FindThinAsset,
-               ArchiveAsset::FindThinHardware,
-               ArchiveAsset::ArchiveAsset,
-               ArchiveAsset::ArchiveHardware
+      organize ForemanLiudeskCMDB::ArchiveAsset::AttachThinAsset,
+               ForemanLiudeskCMDB::ArchiveAsset::AttachThinHardware,
+               ForemanLiudeskCMDB::ArchiveAsset::ArchiveAsset,
+               ForemanLiudeskCMDB::ArchiveAsset::ArchiveHardware
     end
   end
 end

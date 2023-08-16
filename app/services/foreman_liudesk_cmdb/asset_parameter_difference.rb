@@ -23,7 +23,7 @@ module ForemanLiudeskCMDB
     attr_accessor :host
 
     def deep_diff(h_a, h_b)
-      (h_a.keys | h_b.keys).each_with_object({}) do |diff, k|
+      (h_a.keys | h_b.keys).each_with_object({}) do |k, diff|
         if h_a[k] != h_b[k]
           diff[k] = if h_a[k].is_a?(Hash) && h_b[k].is_a?(Hash)
                       deep_diff(h_a[k], h_b[k])

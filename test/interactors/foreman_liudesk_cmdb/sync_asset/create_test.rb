@@ -54,6 +54,17 @@ class CreateAssetTest < ActiveSupport::TestCase
       assert_equal hostname, subject.asset.identifier
       assert_requested stub_post
     end
+
+    it "handles errors correctly" do
+      stub_post = stub_request(:post, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server").to_return(
+        status: 400,
+        body: {}.to_json
+      )
+
+      refute subject.success?
+      refute subject.asset
+      assert_requested stub_post
+    end
   end
 
   context "when asset is already assigned to the context" do

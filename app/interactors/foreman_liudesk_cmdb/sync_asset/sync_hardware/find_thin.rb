@@ -8,11 +8,11 @@ module ForemanLiudeskCMDB
         include ::Interactor
 
         around do |interactor|
-          interactor.call if facet.hardware_id
+          interactor.call if facet.hardware?
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::API.get_asset(:hardware_v1, facet.hardware_id, thin: true)
+          context.hardware = ForemanLiudeskCMDB::API.get_asset(facet.hardware_model_type, facet.hardware_id, thin: true)
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")

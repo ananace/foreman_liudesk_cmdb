@@ -20,7 +20,7 @@ module ForemanLiudeskCMDB
 
       if liudesk_cmdb_facet
         f = liudesk_cmdb_facet
-        f.update_attributes attrs
+        f.update attrs
       else
         f = build_liudesk_cmdb_facet attrs
         f.save if persisted?

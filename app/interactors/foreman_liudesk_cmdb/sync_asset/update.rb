@@ -17,7 +17,6 @@ module ForemanLiudeskCMDB
 
         asset.patch! if asset.changed?
       rescue StandardError => e
-        puts "Update failed - #{e.class}: #{e}\n#{e.backtrace}"
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
         context.fail!(error: "#{self.class}: #{e}")

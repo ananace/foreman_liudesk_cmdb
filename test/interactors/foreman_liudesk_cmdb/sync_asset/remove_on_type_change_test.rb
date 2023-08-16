@@ -58,6 +58,7 @@ class RemoveOnTypeChangeAssetTest < ActiveSupport::TestCase
 
     context "when asset type is different" do
       it "removes the old asset" do
+        Time.stubs(:now).returns(Time.new(2020, 1, 1))
         stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Clients/linux/#{hostname}").with( # rubocop:disable Layout/LineLength
           body: {
             hostName: "#{hostname}-chng-#{Time.now.to_i}"
@@ -77,6 +78,19 @@ class RemoveOnTypeChangeAssetTest < ActiveSupport::TestCase
         refute host.liudesk_cmdb_facet.asset_id
         assert_requested stub_patch
         assert_requested stub_delete
+      end
+
+      it "handles errors correctly" do
+        Time.stubs(:now).returns(Time.new(2020, 1, 1))
+        stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Clients/linux/#{hostname}").to_return( # rubocop:disable Layout/LineLength
+          status: 400,
+          body: {}.to_json
+        )
+
+        refute subject.success?
+        assert subject.asset
+        assert host.liudesk_cmdb_facet.asset_id
+        assert_requested stub_patch
       end
     end
   end

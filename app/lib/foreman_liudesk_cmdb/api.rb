@@ -29,5 +29,11 @@ module ForemanLiudeskCMDB
       asset.create if save
       asset
     end
+
+    def self.network_access_roles
+      Rails.cache("CMDB.network_access_roles").get do
+        JSON.parse client.get("liudesk-cmdb/api/networkaccessroles", :v1)
+      end
+    end
   end
 end

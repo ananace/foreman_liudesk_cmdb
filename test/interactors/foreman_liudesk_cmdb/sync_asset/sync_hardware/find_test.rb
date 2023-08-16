@@ -60,6 +60,32 @@ class FindHardwareTest < ActiveSupport::TestCase
       assert_equal "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0", subject.hardware.identifier
       assert_requested stub_get
     end
+
+    it "searches for a hardware object and handles empty result correctly" do
+      stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
+        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123" }
+      ).to_return(
+        status: 200,
+        body: [].to_json
+      )
+
+      assert subject.success?
+      refute subject.hardware
+      assert_requested stub_get
+    end
+
+    it "handles errors correctly" do
+      stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
+        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123" }
+      ).to_return(
+        status: 400,
+        body: {}.to_json
+      )
+
+      refute subject.success?
+      refute subject.hardware
+      assert_requested stub_get
+    end
   end
 
   context "when hardware is already assigned to the context" do

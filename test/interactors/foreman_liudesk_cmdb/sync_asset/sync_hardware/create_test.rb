@@ -63,6 +63,17 @@ class CreateHardwareTest < ActiveSupport::TestCase
       assert_equal hardware_id, subject.hardware.identifier
       assert_requested stub_post
     end
+
+    it "handles errors correctly" do
+      stub_post = stub_request(:post, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware").to_return(
+        status: 400,
+        body: {}.to_json
+      )
+
+      refute subject.success?
+      refute subject.hardware
+      assert_requested stub_post
+    end
   end
 
   context "when hardware is already assigned to the context" do

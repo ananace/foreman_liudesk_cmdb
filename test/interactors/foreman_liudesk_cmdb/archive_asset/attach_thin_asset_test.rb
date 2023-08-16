@@ -2,11 +2,10 @@
 
 require "test_plugin_helper"
 
-class FindAssetTest < ActiveSupport::TestCase
+class AttachThinAssetArchiveTest < ActiveSupport::TestCase
   subject do
-    ForemanLiudeskCMDB::SyncAsset::Find.call(
-      host: host,
-      cmdb_params: host.liudesk_cmdb_facet.asset_parameters
+    ForemanLiudeskCMDB::ArchiveAsset::AttachThinAsset.call(
+      host: host
     )
   end
 

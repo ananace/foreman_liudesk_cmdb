@@ -109,5 +109,15 @@ class UpdateHardwareTest < ActiveSupport::TestCase
       assert_equal "515bd9a2-d42a-4d4a-b57d-6ce464b549b8", subject.hardware.bios_uuid
       assert_requested stub_patch
     end
+
+    it "handles errors correctly" do
+      stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{hardware.api_url}").to_return(
+        status: 400,
+        body: {}.to_json
+      )
+
+      refute subject.success?
+      assert_requested stub_patch
+    end
   end
 end

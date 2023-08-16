@@ -6,6 +6,9 @@ if ENV["COVERAGE"]
   SimpleCov.start "rails" do
     root File.dirname(__dir__)
 
+    add_group "Interactors", "/app/interactors"
+    add_group "Services", "/app/services"
+
     formatter SimpleCov::Formatter::SimpleFormatter if ENV["CI"]
   end
 end
