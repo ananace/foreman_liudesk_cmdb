@@ -12,10 +12,10 @@ module ForemanLiudeskCMDB
     end
 
     def call
-      cached = CachedAssetParameters.call(host)
-      active = AssetParameters.call(host)
+      @cached = CachedAssetParameters.call(host)
+      @active = AssetParameters.call(host)
 
-      diff = deep_diff(active, cached)
+      diff = deep_diff(@active, @cached)
 
       cleanup_asset(diff[:asset]) if diff[:asset]
       cleanup_hardware(diff[:hardware]) if diff[:hardware]
@@ -51,6 +51,7 @@ module ForemanLiudeskCMDB
     end
 
     def cleanup_hardware(data)
+      data.delete :make if data[:make]&.downcase == @active[:make]&.downcase
       data.delete :mac_and_network_access_roles # FIXME: Only created, not updated
       # data[:mac_and_network_access_roles]&.each { |macs| macs.delete :networkAccessRole }
     end

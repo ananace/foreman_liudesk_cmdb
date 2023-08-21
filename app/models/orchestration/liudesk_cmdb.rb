@@ -13,7 +13,13 @@ module Orchestration
     delegate :asset_params_diff, to: :liudesk_cmdb_facet
 
     def cmdb_orchestration?
-      Setting[:liudesk_cmdb_orchestration_enabled] && liudesk_cmdb_facet
+      return false unless Setting[:liudesk_cmdb_orchestration_enabled]
+      return true if liudesk_cmdb_facet&.asset_will_change?
+      return false if liudesk_cmdb_facet
+      return false unless hostgroup
+      return false if hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet]).empty?
+
+      true
     end
 
     def queue_cmdb_sync
@@ -54,6 +60,7 @@ module Orchestration
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .info("Syncing CMDB data for #{name}")
 
+      liudesk_cmdb_facet! if hostgroup && !liudesk_cmdb_facet
       ForemanLiudeskCMDB::SyncAsset::Organizer.call(host: self)
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
