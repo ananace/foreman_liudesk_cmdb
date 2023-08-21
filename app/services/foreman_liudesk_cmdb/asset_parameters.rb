@@ -58,15 +58,15 @@ module ForemanLiudeskCMDB
     end
 
     def find_asset_management_system
-      { management_system: host.managed? ? "ITI-Foreman" : nil }.compact
+      { management_system: "ITI-Foreman" }
     end
 
     def find_asset_management_system_id
-      { management_system_id: host.managed? ? "#{SETTINGS[:fqdn]}/#{host.id}" : nil }.compact
+      { management_system_id: "#{SETTINGS[:fqdn]}/#{host.id}" }
     end
 
     def find_asset_foreman_link
-      { foreman_link: host.managed? ? "https://#{SETTINGS[:fqdn]}/hosts/#{host.fqdn}" : nil }.compact
+      { foreman_link: "https://#{SETTINGS[:fqdn]}/hosts/#{host.fqdn}" }
     end
 
     def find_asset_certificate_information
@@ -100,15 +100,14 @@ module ForemanLiudeskCMDB
     end
 
     def find_hardware_mac_and_network_access_roles
+      macs = host.interfaces.map { |iface| iface&.mac }.compact.uniq
       {
-        mac_and_network_access_roles: host.interfaces.map do |iface|
-          next unless iface&.mac
-
+        mac_and_network_access_roles: macs.map do |mac|
           {
-            mac: iface.mac&.upcase,
+            mac: mac.upcase,
             networkAccessRole: host.liudesk_cmdb_facet&.asset? ? nil : "None"
           }.compact
-        end.compact
+        end
       }
     end
   end

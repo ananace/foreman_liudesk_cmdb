@@ -6,7 +6,8 @@ class CreateAssetTest < ActiveSupport::TestCase
   subject do
     ForemanLiudeskCMDB::SyncAsset::Create.call(
       host: host,
-      cmdb_params: host.liudesk_cmdb_facet.asset_parameters
+      cmdb_params: host.liudesk_cmdb_facet.asset_parameters,
+      asset: asset
     )
   end
 
@@ -14,6 +15,7 @@ class CreateAssetTest < ActiveSupport::TestCase
   let(:asset_type) { "server" }
   let(:network_role) { nil }
   let(:asset_id) { nil }
+  let(:asset) { nil }
   let(:hardware_id) { "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0" }
   let(:host) do
     FactoryBot.build_stubbed(:host, hostname: hostname).tap do |host|
@@ -30,7 +32,7 @@ class CreateAssetTest < ActiveSupport::TestCase
     setup_default_cmdb_settings
   end
 
-  context "when asset is not assigned to the context" do
+  context "when asset is not assigned to the facet" do
     let(:asset_id) { nil }
 
     it "creates an asset" do
@@ -40,7 +42,10 @@ class CreateAssetTest < ActiveSupport::TestCase
           networkAccessRole: "None",
           hardwareID: hardware_id,
           operatingSystemType: "N/A",
-          operatingSystem: "N/A"
+          operatingSystem: "N/A",
+          managementSystem: "ITI-Foreman",
+          managementSystemId: "#{SETTINGS[:fqdn]}/#{host.id}",
+          foremanLink: "https://#{SETTINGS[:fqdn]}/hosts/#{host.name}"
         }
       ).to_return(
         status: 201,
@@ -65,9 +70,19 @@ class CreateAssetTest < ActiveSupport::TestCase
       refute subject.asset
       assert_requested stub_post
     end
+
+    context "when asset is attached to the context" do
+      let(:asset) { OpenStruct.new identifier: hostname }
+
+      it "does not create an asset" do
+        assert subject.success?
+        assert subject._called.empty?
+        refute_requested stub_request(:post, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server")
+      end
+    end
   end
 
-  context "when asset is already assigned to the context" do
+  context "when asset is already assigned to the facet" do
     let(:asset_id) { hostname }
 
     it "does not create an asset" do

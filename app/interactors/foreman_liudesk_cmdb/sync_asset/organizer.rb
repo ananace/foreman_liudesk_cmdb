@@ -9,18 +9,11 @@ module ForemanLiudeskCMDB
       before do
         context.cached_params = facet.cached_asset_parameters
         context.cmdb_params = facet.asset_parameters
-        context.raw_data = {}
-      end
-
-      after do
-        if context.asset&.retrieved?
-          context.raw_data[:asset] = context.asset.class.convert_ruby_to_cmdb context.asset.raw_data!
-          context.raw_data[:asset_type] = context.asset.class.name.split("::").last._cmdb_snake_case
-        end
+        context.raw_data = facet.raw_data
       end
 
       organize SyncAsset::SyncHardware::Organizer,
-               SyncAsset::FindThin,
+               SyncAsset::AttachThin,
                SyncAsset::Find,
                SyncAsset::RemoveOnTypeChange,
                SyncAsset::Create,
@@ -30,6 +23,11 @@ module ForemanLiudeskCMDB
       def call
         super
       ensure
+        if context.asset&.retrieved?
+          context.raw_data[:asset] = context.asset.class.convert_ruby_to_cmdb context.asset.raw_data!
+          context.raw_data[:asset_type] = context.asset.class.name.split("::").last._cmdb_snake_case
+        end
+
         update_status
       end
 

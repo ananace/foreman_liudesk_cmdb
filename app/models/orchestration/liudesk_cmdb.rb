@@ -10,9 +10,7 @@ module Orchestration
       before_destroy :cmdb_archive_asset_blocking, if: :cmdb_orchestration?
     end
 
-    delegate :asset_will_change?, :asset_params_diff, to: :liudesk_cmdb_facet
-
-    protected
+    delegate :asset_params_diff, to: :liudesk_cmdb_facet
 
     def cmdb_orchestration?
       Setting[:liudesk_cmdb_orchestration_enabled] && liudesk_cmdb_facet

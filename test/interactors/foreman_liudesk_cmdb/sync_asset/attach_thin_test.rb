@@ -2,9 +2,9 @@
 
 require "test_plugin_helper"
 
-class FindAssetTest < ActiveSupport::TestCase
+class SyncAttachThinAssetTest < ActiveSupport::TestCase
   subject do
-    ForemanLiudeskCMDB::SyncAsset::Find.call(
+    ForemanLiudeskCMDB::SyncAsset::AttachThin.call(
       host: host,
       cmdb_params: host.liudesk_cmdb_facet.asset_parameters
     )
@@ -29,32 +29,10 @@ class FindAssetTest < ActiveSupport::TestCase
     setup_default_cmdb_settings
   end
 
-  context "when asset id is not assigned" do
-    let(:asset_id) { nil }
-
-    it "attempts to acquire an asset" do
-      stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server/#{host.name}").to_return(
-        status: 200,
-        body: {
-          hostName: host.name,
-          hardwareID: "blah"
-        }.to_json
-      )
-
+  context "when asset id is assigned" do
+    it "attaches a thin asset" do
       assert subject.success?
       assert_equal hostname, subject.asset.identifier
-      assert_requested stub_get
-    end
-
-    it "handles expected errors" do
-      stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server/#{host.name}").to_return(
-        status: 404,
-        body: {}.to_json
-      )
-
-      assert subject.success?
-      refute subject.asset
-      assert_requested stub_get
     end
 
     it "handles failures correctly" do
@@ -65,8 +43,10 @@ class FindAssetTest < ActiveSupport::TestCase
     end
   end
 
-  context "when asset id is assigned" do
-    it "does nothing" do
+  context "when asset id is not assigned" do
+    let(:asset_id) { nil }
+
+    it "does not attach a thin asset" do
       assert subject.success?
       assert_nil subject.asset
     end

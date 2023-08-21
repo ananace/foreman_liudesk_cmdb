@@ -15,12 +15,23 @@ module ForemanLiudeskCMDB
       cached = CachedAssetParameters.call(host)
       active = AssetParameters.call(host)
 
-      deep_diff(active, cached)
+      diff = deep_diff(active, cached)
+
+      cleanup_asset(diff[:asset]) if diff[:asset]
+      cleanup_hardware(diff[:hardware]) if diff[:hardware]
+
+      diff.delete_if { |_, v| v.nil? || v.empty? }
+
+      diff
     end
 
     private
 
     attr_accessor :host
+
+    def facet
+      host.liudesk_cmdb_facet
+    end
 
     def deep_diff(h_a, h_b)
       (h_a.keys | h_b.keys).each_with_object({}) do |k, diff|
@@ -33,6 +44,15 @@ module ForemanLiudeskCMDB
         end
         diff
       end
+    end
+
+    def cleanup_asset(data)
+      data.delete :network_access_role if facet.network_role.nil? || facet.network_role.empty?
+    end
+
+    def cleanup_hardware(data)
+      data.delete :mac_and_network_access_roles # FIXME: Only created, not updated
+      # data[:mac_and_network_access_roles]&.each { |macs| macs.delete :networkAccessRole }
     end
   end
 end

@@ -7,11 +7,13 @@ module ForemanLiudeskCMDB
       include ::Interactor
 
       around do |interactor|
-        interactor.call if facet.asset?
+        interactor.call if !context.asset && !facet.asset?
       end
 
       def call
-        context.asset = ForemanLiudeskCMDB::API.get_asset(asset_model_type, facet.asset_id, thin: true)
+        context.asset = ForemanLiudeskCMDB::API.get_asset(asset_model_type, host.fqdn)
+      rescue LiudeskCMDB::NotFoundError
+        # Asset not found, continue
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")

@@ -25,25 +25,19 @@
         label_help_options: { data: { placement: 'top' } },
       })
 %>
-<%# text_f lacks inherit/disable_button functionality %>
-<%= field(f, :network_role) do
-      input_part = f.text_field :network_role,
-                                class: "form-control",
-                                disabled: inherited,
-                                help_inline: :indicator,
-                                label: _('CMDB Network Role'),
-                                label_help_options: { data: { placement: 'top' } }
-      button_part = content_tag :span, class: "input-group-btn" do
-        content_tag :button, _(HostsAndHostgroupsHelper::INHERIT_TEXT), type: "button", href: "#",
-                    class: "form-control",
-                    name: "is_overridden_btn",
-                    onclick: "disableButtonToggle(this)",
-                    class: "btn btn-default btn-can-disable #{inherited ? "active" : ""}",
-                    data: { toggle: "button", explicit: false }
-      end
-
-      input_group input_part, button_part
-    end %>
+<%- if false -%>
+<%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles, :itself, :itself,
+      { include_blank: true,
+        selected: facet&.network_role,
+        disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
+        disable_button_enabled: inherited,
+      },
+      { help_inline: :indicator,
+        label: _('CMDB Network Role'),
+        label_help_options: { data: { placement: 'top' } },
+      })
+%>
+<%- end -%>
 <%-
   end
 end
