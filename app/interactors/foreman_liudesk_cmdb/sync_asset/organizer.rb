@@ -7,9 +7,9 @@ module ForemanLiudeskCMDB
       include ::Interactor::Organizer
 
       before do
-        context.cached_params = facet.cached_asset_parameters
-        context.cmdb_params = facet.asset_parameters
-        context.raw_data = facet.raw_data
+        context.cached_params = facet.cached_asset_parameters || {}
+        context.cmdb_params = facet.asset_parameters || {}
+        context.raw_data = facet.raw_data || {}
       end
 
       organize SyncAsset::SyncHardware::Organizer,
