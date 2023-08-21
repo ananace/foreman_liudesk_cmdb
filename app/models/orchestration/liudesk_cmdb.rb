@@ -6,13 +6,19 @@ module Orchestration
     extend ActiveSupport::Concern
 
     included do
-      after_validation :queue_cmdb_sync, if: :cmdb_orchestration?
+      after_validation :queue_cmdb_sync, if: :cmdb_orchestration_with_inherit?
       before_destroy :cmdb_archive_asset_blocking, if: :cmdb_orchestration?
     end
 
     delegate :asset_params_diff, to: :liudesk_cmdb_facet
 
     def cmdb_orchestration?
+      return false unless Setting[:liudesk_cmdb_orchestration_enabled]
+
+      !liudesk_cmdb_facet.nil?
+    end
+
+    def cmdb_orchestration_with_inherit?
       return false unless Setting[:liudesk_cmdb_orchestration_enabled]
       return true if liudesk_cmdb_facet&.asset_will_change?
       return false if liudesk_cmdb_facet
