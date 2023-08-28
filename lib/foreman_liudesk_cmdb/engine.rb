@@ -38,7 +38,7 @@ module ForemanLiudeskCMDB
           category(:liudesk_cmdb, N_("CMDB")) do
             setting "liudesk_cmdb_url",
                     type: :string,
-                    default: "https://api.test.liu.se",
+                    default: "https://api.test.it.liu.se",
                     full_name: N_("CMDB API URL"),
                     description: N_("URL where the CMDB API is located")
             setting :liudesk_cmdb_token,
