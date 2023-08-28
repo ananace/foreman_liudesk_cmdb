@@ -17,6 +17,7 @@ class FindHardwareTest < ActiveSupport::TestCase
   let(:asset_id) { hostname }
   let(:hardware_id) { nil }
   let(:hardware) { nil }
+  let(:mac) { "00:01:02:03:04:05" }
   let(:host) do
     FactoryBot.build_stubbed(:host, hostname: hostname).tap do |host|
       host.stubs(:facts).returns(
@@ -25,7 +26,7 @@ class FindHardwareTest < ActiveSupport::TestCase
         "productname" => "HP ProLiant DL480 Gen8",
         "uuid" => "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
       )
-      host.interfaces.new mac: "00:01:02:03:04:05"
+      host.primary_interface.mac = mac
 
       facet = host.build_liudesk_cmdb_facet
       facet.asset_type = asset_type
@@ -42,7 +43,7 @@ class FindHardwareTest < ActiveSupport::TestCase
   context "when hardware is not assigned" do
     it "searches for a hardware object and attaches if found" do
       stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
-        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123" }
+        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123,macAndNetworkAccessRoles.mac==00:01:02:03:04:05" }
       ).to_return(
         status: 200,
         body: [
@@ -63,7 +64,7 @@ class FindHardwareTest < ActiveSupport::TestCase
 
     it "searches for a hardware object and handles empty result correctly" do
       stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
-        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123" }
+        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123,macAndNetworkAccessRoles.mac==00:01:02:03:04:05" }
       ).to_return(
         status: 200,
         body: [].to_json
@@ -76,7 +77,7 @@ class FindHardwareTest < ActiveSupport::TestCase
 
     it "handles errors correctly" do
       stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
-        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123" }
+        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123,macAndNetworkAccessRoles.mac==00:01:02:03:04:05" }
       ).to_return(
         status: 400,
         body: {}.to_json
@@ -85,6 +86,32 @@ class FindHardwareTest < ActiveSupport::TestCase
       refute subject.success?
       refute subject.hardware
       assert_requested stub_get
+    end
+
+    context "when host lacks a MAC-address" do
+      let(:mac) { "" }
+
+
+      it "generates a valid search string" do
+        stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
+          query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123" }
+        ).to_return(
+          status: 200,
+          body: [
+            {
+              guid: "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0",
+              make: "HP",
+              model: "ProLiant DL480 Gen8",
+              name: "HP Proliant DL480 Gen8-0001"
+            }
+          ].to_json
+        )
+
+        assert subject.success?
+        assert subject.hardware
+        assert_equal "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0", subject.hardware.identifier
+        assert_requested stub_get
+      end
     end
   end
 
