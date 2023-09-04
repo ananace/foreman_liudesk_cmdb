@@ -36,7 +36,7 @@ module ForemanLiudeskCMDB
       delegate :host, :error, to: :context
 
       def facet
-        host.liudesk_cmdb_facet
+        host.liudesk_cmdb_facet!
       end
 
       def update_status

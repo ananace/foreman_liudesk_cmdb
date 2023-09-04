@@ -66,7 +66,6 @@ module Orchestration
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .info("Syncing CMDB data for #{name}")
 
-      liudesk_cmdb_facet! if hostgroup && !liudesk_cmdb_facet
       ForemanLiudeskCMDB::SyncAsset::Organizer.call(host: self)
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
