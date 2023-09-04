@@ -3,12 +3,14 @@
 module ForemanLiudeskCMDB
   # Cached asset parameters retrieval helper
   class CachedAssetParameters
-    def self.call(host)
-      new(host).call
+    def self.call(host, **params)
+      new(host, **params).call
     end
 
-    def initialize(host)
+    def initialize(host, sliced: true, compacted: false)
       @host = host
+      @sliced = sliced
+      @compacted = compacted
     end
 
     def call
@@ -22,7 +24,7 @@ module ForemanLiudeskCMDB
 
     private
 
-    attr_accessor :host
+    attr_accessor :host, :sliced, :compacted
 
     def facet
       host.liudesk_cmdb_facet
@@ -38,7 +40,10 @@ module ForemanLiudeskCMDB
       asset_klass = ForemanLiudeskCMDB::API.get_asset_type(asset_type_param || facet.asset_model_type || :server_v1)
 
       params = asset_klass.convert_cmdb_to_ruby(raw_data[:asset] || {})
-      params.slice(*host.liudesk_cmdb_facet.asset_parameter_keys)
+      params = params.slice(*host.liudesk_cmdb_facet.asset_parameter_keys) if sliced
+      params = params.compact if compacted
+
+      params
     end
 
     def asset_type_param
@@ -53,7 +58,10 @@ module ForemanLiudeskCMDB
       asset_klass = ForemanLiudeskCMDB::API.get_asset_type(hardware_type_param || :hardware_v1)
 
       params = asset_klass.convert_cmdb_to_ruby(raw_data[:hardware] || {})
-      params.slice(*host.liudesk_cmdb_facet.hardware_parameter_keys)
+      params = params.slice(*host.liudesk_cmdb_facet.hardware_parameter_keys) if sliced
+      params = params.compact if compacted
+
+      params
     end
 
     def hardware_type_param

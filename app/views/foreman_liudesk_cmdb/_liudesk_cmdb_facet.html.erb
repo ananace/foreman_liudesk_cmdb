@@ -1,0 +1,56 @@
+<%-
+asset_data = ForemanLiudeskCMDB::CachedAssetParameters.call(@host, sliced: false, compacted: true)
+asset_keys = %i[network_access_role certificate_information network_certificate_ca]
+-%>
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th style="border-right: none"><%= _("Asset") %></th>
+      <th style="border-left: none; text-align: right"><%= asset_data[:asset_type].to_s._cmdb_camel_case(capitalized: true)%></th>
+    </tr>
+  </thead>
+
+  <tbody>
+<%- asset_data[:asset].each do |key, value| -%>
+    <tr><td><%= key.to_s._cmdb_camel_case(capitalized: true) %></td><td><%= value %></td></tr>
+<%- end -%>
+  </tbody>
+
+  <tbody style="border: none"><tr><td colspan="2">&nbsp;</td></tr></tbody>
+
+  <thead>
+    <tr>
+      <th style="border-right: none"><%= _("Hardware") %></th>
+      <th style="border-left: none; text-align: right"><%= asset_data[:hardware_type].to_s._cmdb_camel_case(capitalized: true)%></th>
+    </tr>
+  </thead>
+  <tbody>
+<%- asset_data[:hardware].each do |key, value| -%>
+    <tr>
+      <td><%= key.to_s._cmdb_camel_case(capitalized: true) %></td>
+<%- if value.is_a? Array -%>
+      <td>
+<%-   value.each do |entry| -%>
+<%-     if entry.is_a? Hash -%>
+        <table class="table table-bordered">
+          <thead><tr><th colspan="2"></th></tr></thead>
+          <tbody>
+<%-       entry.each do |k, v| %>
+            <tr>
+              <td><%= k[0].capitalize %><%= k.to_s[1..] %></td><td><%= v %></td>
+            </tr>
+<%-       end -%>
+          </tbody>
+        </table>
+<%-     else -%>
+        <%= entry %><br/>
+<%-     end -%>
+<%-   end -%>
+      </td>
+<%- else -%>
+      <td><%= value %></td>
+<%- end -%>
+    </tr>
+<%- end -%>
+  </tbody>
+</table>

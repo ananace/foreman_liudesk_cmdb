@@ -8,7 +8,7 @@
     inherited = facet.nil?
     inherited ||= true if hostgroup&.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])&.any?
 
-    facet ||= item&.build_passwordstate_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])) if inherited && hostgroup
+    facet ||= item&.build_liudesk_cmdb_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])) if inherited && hostgroup
   end
 -%>
 
@@ -25,7 +25,7 @@
         label_help_options: { data: { placement: 'top' } },
       })
 %>
-<%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles, :itself, :itself,
+<%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
       { include_blank: true,
         selected: facet&.network_role,
         disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),

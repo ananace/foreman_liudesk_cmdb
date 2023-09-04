@@ -26,13 +26,15 @@ module ForemanLiudeskCMDB
             set_dependent_action :destroy
 
             extend_model ForemanLiudeskCMDB::HostExtensions
-            # add_tabs liudesk_cmdb_facet: "foreman_liudesk/liudesk_cmdb_facet"
           end
 
           configure_hostgroup ForemanLiudeskCMDB::LiudeskCMDBHostgroupFacet do
             set_dependent_action :destroy
           end
         end
+
+        parameter_filter Host::Managed, liudesk_cmdb_facet_attributes: %i[asset_type network_role]
+        parameter_filter Hostgroup, liudesk_cmdb_facet_attributes: %i[asset_type network_role]
 
         settings do
           category(:liudesk_cmdb, N_("CMDB")) do
@@ -55,6 +57,15 @@ module ForemanLiudeskCMDB
         end
 
         logger :sync, enabled: true
+
+        extend_page("hosts/show") do |ctx|
+          ctx.add_pagelet(
+            :main_tabs,
+            name: _("CMDB"),
+            partial: "foreman_liudesk_cmdb/liudesk_cmdb_facet",
+            onlyif: proc { |host| host.liudesk_cmdb_facet }
+          )
+        end
       end
     end
     # rubocop:enable Metrics/BlockLength
