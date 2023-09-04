@@ -33,17 +33,18 @@ module ForemanLiudeskCMDB
 
       def network_access_roles
         Rails.cache.fetch("#{cache_key}/network_access_roles", expires_in: 8.hours) do
-          JSON.parse client.get("liudesk-cmdb/api/networkaccessroles", :v1)
+          # JSON.parse client.get("liudesk-cmdb/api/networkaccessroles", :v1)
+          %w[None Guest]
         end
       end
 
       private
 
       def cache_key
-        url_hash = Setting[:liudesk_cmdb_url].bytes.inject(0xcafe, :^)
-        key_hash = Setting[:liudesk_cmdb_token].bytes.inject(0xbeef, :^)
+        url_hash = Setting[:liudesk_cmdb_url].bytes.inject(0xaf, :^)
+        key_hash = Setting[:liudesk_cmdb_token].bytes.inject(0xed, :^)
 
-        "LiudeskCMDBAPI/#{url_hash}-#{key_hash}"
+        "LiudeskCMDBAPI/#{url_hash * key_hash}"
       end
     end
   end

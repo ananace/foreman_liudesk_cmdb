@@ -25,7 +25,6 @@
         label_help_options: { data: { placement: 'top' } },
       })
 %>
-<%- if false -%>
 <%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles, :itself, :itself,
       { include_blank: true,
         selected: facet&.network_role,
@@ -37,7 +36,6 @@
         label_help_options: { data: { placement: 'top' } },
       })
 %>
-<%- end -%>
 <%-
   end
 end
