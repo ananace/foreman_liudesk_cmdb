@@ -12,7 +12,15 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::API.find_asset(facet.hardware_model_type, **search_params).first
+          found = ForemanLiudeskCMDB::API.find_asset(facet.hardware_model_type, **search_params)
+
+          if found.count > 1
+            ::Foreman::Logging
+              .logger("foreman_liudesk_cmdb/sync")
+              .warn("#{self.class} found multiple potential hardware assets.")
+          end
+
+          context.hardware = found.first
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")

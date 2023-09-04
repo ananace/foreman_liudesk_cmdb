@@ -62,6 +62,33 @@ class FindHardwareTest < ActiveSupport::TestCase
       assert_requested stub_get
     end
 
+    it "handles multiple results" do
+      stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
+        query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123,macAndNetworkAccessRoles.mac==00:01:02:03:04:05" }
+      ).to_return(
+        status: 200,
+        body: [
+          {
+            guid: "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0",
+            make: "HP",
+            model: "ProLiant DL480 Gen8",
+            name: "HP Proliant DL480 Gen8-0001"
+          },
+          {
+            guid: "48fd8d16-be97-4e79-b1c6-46b831fffad9",
+            make: "HP",
+            model: "ProLiant DL480 Gen8",
+            name: "HP Proliant DL480 Gen8-0002"
+          }
+        ].to_json
+      )
+
+      assert subject.success?
+      assert subject.hardware
+      assert_equal "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0", subject.hardware.identifier
+      assert_requested stub_get
+    end
+
     it "searches for a hardware object and handles empty result correctly" do
       stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/search").with(
         query: { query: "biosUuid==515bd9a2-d42a-4d4a-b57d-6ce464b549b8,serialNumber==abc123,macAndNetworkAccessRoles.mac==00:01:02:03:04:05" }
