@@ -2,7 +2,7 @@
 asset_data = ForemanLiudeskCMDB::CachedAssetParameters.call(@host, sliced: false, compacted: true)
 asset_keys = %i[network_access_role certificate_information network_certificate_ca]
 -%>
-<table class="table table-bordered table-striped">
+<table class="table table-bordered table-striped" style="margin-bottom: 2rem">
   <thead>
     <tr>
       <th style="border-right: none"><%= _("Asset") %></th>
@@ -37,7 +37,7 @@ asset_keys = %i[network_access_role certificate_information network_certificate_
           <tbody>
 <%-       entry.each do |k, v| %>
             <tr>
-              <td><%= k[0].capitalize %><%= k.to_s[1..] %></td><td><%= v %></td>
+              <td><%= k.to_s[0].capitalize %><%= k.to_s[1..] %></td><td><%= v %></td>
             </tr>
 <%-       end -%>
           </tbody>

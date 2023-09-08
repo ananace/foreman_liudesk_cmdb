@@ -11,6 +11,9 @@ module ForemanLiudeskCMDB
       end
 
       def call
+        context.hardware.mac_and_network_access_roles = nil
+        context.hardware.patch!
+
         context.hardware.delete!
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")

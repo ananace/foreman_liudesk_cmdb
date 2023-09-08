@@ -7,7 +7,7 @@ module ForemanLiudeskCMDB
   class LiudeskCMDBFacet < ApplicationRecord
     # Allow use of asset type in jails
     class Jail < Safemode::Jail
-      allow :asset_type
+      allow :cached_asset_parameters
     end
 
     include Facets::Base
@@ -38,6 +38,16 @@ module ForemanLiudeskCMDB
 
     def client?
       asset_type.to_s != "server"
+    end
+
+    def hardware_network_role_fallback
+      return nil unless host&.hostgroup
+
+      inherited = host.hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
+      inherited = inherited[:hardware_fallback_role]
+      return nil if inherited.nil? || inherited.empty?
+
+      inherited
     end
 
     def asset_parameter_keys

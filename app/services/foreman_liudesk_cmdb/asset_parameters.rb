@@ -24,12 +24,16 @@ module ForemanLiudeskCMDB
 
     attr_accessor :host
 
+    def facet
+      host.liudesk_cmdb_facet
+    end
+
     def asset_params
-      host.liudesk_cmdb_facet.asset_parameter_keys.map { |param| send("find_asset_#{param}") }.inject({}, :merge)
+      facet.asset_parameter_keys.map { |param| send("find_asset_#{param}") }.inject({}, :merge)
     end
 
     def hardware_params
-      host.liudesk_cmdb_facet.hardware_parameter_keys.map { |param| send("find_hardware_#{param}") }.inject({}, :merge)
+      facet.hardware_parameter_keys.map { |param| send("find_hardware_#{param}") }.inject({}, :merge)
     end
 
     def find_asset_hostname
@@ -37,7 +41,7 @@ module ForemanLiudeskCMDB
     end
 
     def find_asset_network_access_role
-      role = host.liudesk_cmdb_facet.network_role
+      role = facet.network_role
       role = nil if role&.empty?
 
       {
@@ -100,12 +104,17 @@ module ForemanLiudeskCMDB
     end
 
     def find_hardware_mac_and_network_access_roles
-      macs = host.interfaces.map { |iface| iface&.mac }.compact.uniq
+      roles = {}
+      host.interfaces.select { |iface| iface&.mac }.compact.each do |iface|
+        role = iface.network_access_role unless iface.network_access_role.nil? || iface.network_access_role.empty?
+        roles[iface.mac.upcase] ||= role
+      end
+
       {
-        mac_and_network_access_roles: macs.map do |mac|
+        mac_and_network_access_roles: roles.map do |mac, role|
           {
-            mac: mac.upcase,
-            networkAccessRole: host.liudesk_cmdb_facet&.asset? ? nil : "None"
+            mac: mac,
+            networkAccessRole: role || facet.hardware_network_role_fallback || "None"
           }.compact
         end
       }

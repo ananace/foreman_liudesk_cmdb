@@ -36,7 +36,20 @@
         label_help_options: { data: { placement: 'top' } },
       })
 %>
+<%- if item == @hostgroup -%>
+<%= select_f(f, :hardware_fallback_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
+      { include_blank: true,
+        selected: facet&.hardware_fallback_role,
+        disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
+        disable_button_enabled: inherited,
+      },
+      { help_inline: :indicator,
+        label: _('CMDB Hardware Fallback Role'),
+        label_help_options: { data: { placement: 'top' } },
+      })
+%>
 <%-
+    end
   end
 end
 -%>

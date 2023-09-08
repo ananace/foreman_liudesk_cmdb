@@ -1,0 +1,18 @@
+<%-
+  item = f.object
+-%>
+<%= f.fields_for 'liudesk_cmdb_facet_attributes' do |f| %>
+<%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
+      { include_blank: true,
+        selected: item.network_access_role,
+        disable_button: N_("override"),
+        disable_button_enabled: true,
+      },
+      { help_inline: :indicator,
+        label: _('CMDB Network Role'),
+        label_help_options: { data: { placement: 'top' } },
+        size: 'col-md-8',
+        label_size: 'col-md-3'
+      })
+%>
+<%- end -%>

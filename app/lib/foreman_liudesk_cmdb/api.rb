@@ -33,7 +33,9 @@ module ForemanLiudeskCMDB
 
       def network_access_roles
         Rails.cache.fetch("#{cache_key}/network_access_roles", expires_in: 8.hours) do
-          # JSON.parse client.get("liudesk-cmdb/api/networkaccessroles", :v1)
+          JSON.parse client.get("liudesk-cmdb/api/networkaccessroles", :v1)
+        rescue StandardError => e
+          Rails.logger.warn "Failed to retrieve CMDB network access roles, using fallback. #{e.class}: #{e}"
           %w[None Guest]
         end
       end
