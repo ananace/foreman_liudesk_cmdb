@@ -125,13 +125,9 @@ module ForemanLiudeskCMDB
     private
 
     def cleanup_hardware_network_roles
-      puts "Cleaning network roles:"
-      puts hardware_network_roles
-      hardware_network_roles.delete_if do |_mac, entry|
+      hardware_network_roles&.delete_if do |_mac, entry|
         !entry.key?("role") || entry["role"].nil? || entry["role"].empty?
       end
-      puts "After cleaning:"
-      puts hardware_network_roles
     end
   end
 end
