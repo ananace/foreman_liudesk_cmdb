@@ -1,29 +1,30 @@
 # frozen_string_literal: true
 
 module ForemanLiudeskCMDB
-  module NicManagedExtensions
+  # Extensions for Nic::Base to handle per-NIC network roles
+  module NicBaseExtensions
     extend ActiveSupport::Concern
 
     def network_access_role
       return unless mac
       return unless host&.liudesk_cmdb_facet
 
-      roles = host.liudesk_cmdb_facet.hardware_network_roles || []
-      roles.find { |role| role["identifier"] == identifier || role["mac"] == mac }&.fetch("role", nil)
+      roles = host.liudesk_cmdb_facet.hardware_network_roles || {}
+      roles[mac.downcase]&.fetch("role", nil)
     end
 
     def network_access_role=(new_role)
+      puts "For #{self}: Changing role to #{new_role}"
+
       return unless mac
       return unless host&.liudesk_cmdb_facet
 
-      roles = host.liudesk_cmdb_facet.hardware_network_roles || []
-      found = roles.find { |role| role["identifier"] == identifier || role["mac"] == mac }
+      roles = host.liudesk_cmdb_facet.hardware_network_roles || {}
+      found = roles[mac.downcase]
+
       unless found
-        found = {
-          "identifier" => identifier,
-          "mac" => mac
-        }
-        roles << found
+        found = {}
+        roles[mac] = found
       end
 
       found["role"] = new_role

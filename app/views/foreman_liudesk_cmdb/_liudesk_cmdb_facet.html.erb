@@ -1,18 +1,28 @@
 <%-
 asset_data = ForemanLiudeskCMDB::CachedAssetParameters.call(@host, sliced: false, compacted: true)
 asset_keys = %i[network_access_role certificate_information network_certificate_ca]
+facet = @host.liudesk_cmdb_facet
 -%>
+<div class="additional-info ca w-100">Last synced <span title="<%= facet.sync_at %>"><%= time_ago_in_words(facet.sync_at) %> ago</span>
+<%-
+  if facet.sync_error
+-%>
+<br/><span class="tab-error"><%= facet.sync_error %></span>
+<%-
+  end
+-%>
+</div>
 <table class="table table-bordered table-striped" style="margin-bottom: 2rem">
   <thead>
     <tr>
       <th style="border-right: none"><%= _("Asset") %></th>
-      <th style="border-left: none; text-align: right"><%= asset_data[:asset_type].to_s._cmdb_camel_case(capitalized: true)%></th>
+      <th style="border-left: none; text-align: right"><%= asset_data[:asset_type]&.to_s&._cmdb_camel_case(capitalized: true, spaced: true)%></th>
     </tr>
   </thead>
 
   <tbody>
-<%- asset_data[:asset].each do |key, value| -%>
-    <tr><td><%= key.to_s._cmdb_camel_case(capitalized: true) %></td><td><%= value %></td></tr>
+<%- asset_data[:asset]&.sort&.each do |key, value| -%>
+    <tr><td><%= key.to_s._cmdb_camel_case(capitalized: true, spaced: true) %></td><td><%= value %></td></tr>
 <%- end -%>
   </tbody>
 
@@ -21,13 +31,13 @@ asset_keys = %i[network_access_role certificate_information network_certificate_
   <thead>
     <tr>
       <th style="border-right: none"><%= _("Hardware") %></th>
-      <th style="border-left: none; text-align: right"><%= asset_data[:hardware_type].to_s._cmdb_camel_case(capitalized: true)%></th>
+      <th style="border-left: none; text-align: right"><%= asset_data[:hardware_type]&.to_s&._cmdb_camel_case(capitalized: true, spaced: true)%></th>
     </tr>
   </thead>
   <tbody>
-<%- asset_data[:hardware].each do |key, value| -%>
+<%- asset_data[:hardware]&.sort&.each do |key, value| -%>
     <tr>
-      <td><%= key.to_s._cmdb_camel_case(capitalized: true) %></td>
+      <td><%= key.to_s._cmdb_camel_case(capitalized: true, spaced: true) %></td>
 <%- if value.is_a? Array -%>
       <td>
 <%-   value.each do |entry| -%>

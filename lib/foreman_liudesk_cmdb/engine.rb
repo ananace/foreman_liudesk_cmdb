@@ -34,11 +34,12 @@ module ForemanLiudeskCMDB
         end
 
         parameter_filter Host::Managed, liudesk_cmdb_facet_attributes: %i[
-          asset_type hardware_network_roles network_role
+          asset_type hardware_fallback_role hardware_network_roles network_role
         ]
         parameter_filter Hostgroup, liudesk_cmdb_facet_attributes: %i[
           asset_type hardware_fallback_role network_role
         ]
+        parameter_filter(Nic::Interface) { |ctx| ctx.permit(:network_access_role) if ctx.nested? }
 
         settings do
           category(:liudesk_cmdb, N_("CMDB")) do
@@ -75,8 +76,7 @@ module ForemanLiudeskCMDB
     # rubocop:enable Metrics/BlockLength
 
     config.to_prepare do
-      Nic::Managed.include ForemanLiudeskCMDB::NicManagedExtensions
-      HostsController.prepend ForemanLiudeskCMDB::HostsControllerExtensions
+      Nic::Base.include ForemanLiudeskCMDB::NicBaseExtensions
     rescue StandardError => e
       Rails.logger.warn "foreman_liudesk_cmdb: skipping engine hook (#{e})\n#{e.backtrace.join("\n")}"
     end

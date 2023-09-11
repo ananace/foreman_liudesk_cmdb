@@ -10,12 +10,17 @@ module ForemanLiudeskCMDB
       allow :cached_asset_parameters
     end
 
+    # Fully resync data at least once every 24 hours
+    FULL_RESYNC_INTERVAL = 24 * 60 * 60
+
     include Facets::Base
 
     validates_lengths_from_database
 
     validates :host, presence: true, allow_blank: false
     validates :asset_type, presence: true
+
+    before_save :cleanup_hardware_network_roles
 
     def asset_model_type
       if asset_type.to_s.downcase == "server"
@@ -36,18 +41,24 @@ module ForemanLiudeskCMDB
       :hardware_v1
     end
 
-    def client?
-      asset_type.to_s != "server"
+    def deep_network_role
+      return network_role unless network_role.nil? || network_role.empty?
+
+      host.hostgroup
+        &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
+        &.[]("network_role")
     end
 
-    def hardware_network_role_fallback
-      return nil unless host&.hostgroup
+    def deep_hardware_fallback_role
+      return hardware_fallback_role unless hardware_fallback_role.nil? || hardware_fallback_role.empty?
 
-      inherited = host.hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
-      inherited = inherited[:hardware_fallback_role]
-      return nil if inherited.nil? || inherited.empty?
+      host.hostgroup
+        &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
+        &.[]("hardware_fallback_role")
+    end
 
-      inherited
+    def client?
+      asset_type.to_s != "server"
     end
 
     def asset_parameter_keys
@@ -84,6 +95,7 @@ module ForemanLiudeskCMDB
     end
 
     def asset_will_change?(only: nil)
+      return true if (Time.now - sync_at) >= FULL_RESYNC_INTERVAL
       return true if asset_type_changed?
       return (asset_params_diff[only] || {}).any? if only
 
@@ -108,6 +120,18 @@ module ForemanLiudeskCMDB
       return unless hardware_id
 
       ForemanLiudeskCMDB::API.get_asset(hardware_model_type, hardware_id)
+    end
+
+    private
+
+    def cleanup_hardware_network_roles
+      puts "Cleaning network roles:"
+      puts hardware_network_roles
+      hardware_network_roles.delete_if do |_mac, entry|
+        !entry.key?("role") || entry["role"].nil? || entry["role"].empty?
+      end
+      puts "After cleaning:"
+      puts hardware_network_roles
     end
   end
 end

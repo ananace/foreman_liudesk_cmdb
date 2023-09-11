@@ -1,18 +1,19 @@
 <%-
   item = f.object
+
+  role_set = !item.network_access_role.nil? && !item.network_access_role.empty?
 -%>
-<%= f.fields_for 'liudesk_cmdb_facet_attributes' do |f| %>
-<%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
+<%= select_f(f, :network_access_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
       { include_blank: true,
         selected: item.network_access_role,
-        disable_button: N_("override"),
-        disable_button_enabled: true,
+        disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
+        disable_button_enabled: !role_set,
       },
       { help_inline: :indicator,
         label: _('CMDB Network Role'),
+        label_help: _('A MAC-specific network role to apply when without certificate authentication'),
         label_help_options: { data: { placement: 'top' } },
         size: 'col-md-8',
         label_size: 'col-md-3'
       })
 %>
-<%- end -%>

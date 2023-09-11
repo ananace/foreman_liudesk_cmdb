@@ -8,6 +8,7 @@ class AddLiudeskCmdb < ActiveRecord::Migration[6.1]
 
       t.string :asset_type, null: false
       t.string :network_role, null: true
+      t.string :hardware_fallback_role, null: true
       t.jsonb :hardware_network_roles, null: true
 
       t.string :asset_id, null: true

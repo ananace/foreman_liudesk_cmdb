@@ -10,7 +10,10 @@
 
     facet ||= item&.build_liudesk_cmdb_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])) if inherited && hostgroup
   end
+  inherited ||= true if facet.nil?
 -%>
+
+<%= javascript 'foreman_liudesk_cmdb/host_edit_extensions.js' %>
 
 <%= fields_for item do |f| %>
 <%= f.fields_for 'liudesk_cmdb_facet_attributes' do |f| %>
@@ -23,6 +26,7 @@
       { help_inline: :indicator,
         label: _('CMDB Asset Type'),
         label_help_options: { data: { placement: 'top' } },
+        onchange: 'cmdb_asset_type_changed(this);', 
       })
 %>
 <%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
@@ -33,10 +37,10 @@
       },
       { help_inline: :indicator,
         label: _('CMDB Network Role'),
+        label_help: _('The network role to apply on certificate authentication'),
         label_help_options: { data: { placement: 'top' } },
       })
 %>
-<%- if item == @hostgroup -%>
 <%= select_f(f, :hardware_fallback_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
       { include_blank: true,
         selected: facet&.hardware_fallback_role,
@@ -45,11 +49,11 @@
       },
       { help_inline: :indicator,
         label: _('CMDB Hardware Fallback Role'),
+        label_help: _('The network role to apply without certificate authentication,<br/>unless a more specifc role is set per interface'),
         label_help_options: { data: { placement: 'top' } },
       })
 %>
 <%-
-    end
   end
 end
 -%>

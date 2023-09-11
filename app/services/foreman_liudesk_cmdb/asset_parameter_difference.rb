@@ -47,13 +47,13 @@ module ForemanLiudeskCMDB
     end
 
     def cleanup_asset(data)
-      data.delete :network_access_role if facet.network_role.nil? || facet.network_role.empty?
+      # Avoid pushing impossible role changes
+      data.delete :network_access_role unless @active[:certificate_information]
     end
 
     def cleanup_hardware(data)
+      # Ignore case difference on hardware make, LiUDesk likes to capitalize the input data
       data.delete :make if data[:make]&.downcase == @active[:make]&.downcase
-      data.delete :mac_and_network_access_roles # FIXME: Only created, not updated
-      # data[:mac_and_network_access_roles]&.each { |macs| macs.delete :networkAccessRole }
     end
   end
 end

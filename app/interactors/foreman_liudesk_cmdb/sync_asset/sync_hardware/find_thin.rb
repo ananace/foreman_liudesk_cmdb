@@ -5,6 +5,9 @@ module ForemanLiudeskCMDB
     module SyncHardware
       # Attaches a thin hardware object to the context is one is available
       class FindThin
+        # Skip attaching the thin object if cached data is older than 24h
+        FORCE_FULL_INTERVAL = 24 * 60 * 60
+
         include ::Interactor
 
         around do |interactor|
@@ -12,7 +15,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::API.get_asset(facet.hardware_model_type, facet.hardware_id, thin: true)
+          context.hardware = ForemanLiudeskCMDB::API.get_asset facet.hardware_model_type, facet.hardware_id, thin: thin?
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")
@@ -25,6 +28,10 @@ module ForemanLiudeskCMDB
 
         def facet
           host.liudesk_cmdb_facet
+        end
+
+        def thin?
+          (Time.now - facet.sync_at) < ForemanLiudeskCMDB::LiudeskCMDBFacet::FULL_RESYNC_INTERVAL
         end
       end
     end

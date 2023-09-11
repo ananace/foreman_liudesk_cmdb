@@ -41,11 +41,12 @@ module ForemanLiudeskCMDB
     end
 
     def find_asset_network_access_role
-      role = facet.network_role
+      role = facet.deep_network_role
       role = nil if role&.empty?
+      role = nil unless facet.asset_parameter_keys.include? :certificate_information
 
       {
-        network_access_role: role || (host.liudesk_cmdb_facet.asset? ? nil : "None")
+        network_access_role: role || "None"
       }.compact
     end
 
@@ -106,15 +107,19 @@ module ForemanLiudeskCMDB
     def find_hardware_mac_and_network_access_roles
       roles = {}
       host.interfaces.select { |iface| iface&.mac }.compact.each do |iface|
-        role = iface.network_access_role unless iface.network_access_role.nil? || iface.network_access_role.empty?
-        roles[iface.mac.upcase] ||= role
+        role = iface.network_access_role
+        role = nil if role&.empty?
+
+        roles[iface.mac.upcase] ||= role ||
+                                    facet.deep_hardware_fallback_role ||
+                                    "None"
       end
 
       {
         mac_and_network_access_roles: roles.map do |mac, role|
           {
             mac: mac,
-            networkAccessRole: role || facet.hardware_network_role_fallback || "None"
+            networkAccessRole: role
           }.compact
         end
       }
