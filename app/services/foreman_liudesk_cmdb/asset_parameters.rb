@@ -75,7 +75,7 @@ module ForemanLiudeskCMDB
     end
 
     def find_asset_certificate_information
-      { certificate_information: host.certname }
+      { certificate_information: host.certname || host.fqdn }
     end
 
     def find_asset_network_certificate_ca
