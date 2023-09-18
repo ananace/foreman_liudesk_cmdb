@@ -17,7 +17,11 @@ module ForemanLiudeskCMDB
 
         def call
           hardware_params.slice(*update_params).each do |key, value|
-            hardware.send("#{key}=".to_sym, value) if cached_hardware_params[key] != value
+            if hardware.retrieved?
+              hardware.send(:"#{key}=", value) unless value_diff?(key, hardware.send(key), value)
+            elsif value_diff?(key, cached_hardware_params[key], value)
+              hardware.send(:"#{key}=", value)
+            end
           end
 
           hardware.patch! if hardware.changed?
@@ -37,6 +41,15 @@ module ForemanLiudeskCMDB
 
         def hardware_params
           cmdb_params[:hardware]
+        end
+
+        def value_diff?(key, current, wanted)
+          if key == :mac_and_network_access_roles
+            current.to_h { |val| [val[:mac].downcase, val[:networkAccessRole]] } \
+              != wanted.to_h { |val| [val[:mac].downcase, val[:networkAccessRole]] }
+          else
+            current != wanted
+          end
         end
       end
     end

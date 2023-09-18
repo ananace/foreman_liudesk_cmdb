@@ -12,7 +12,11 @@ module ForemanLiudeskCMDB
 
       def call
         asset_params.slice(*update_params).each do |key, value|
-          asset.send("#{key}=".to_sym, value) if cached_asset_params[key] != value
+          if asset.retrieved?
+            asset.send(:"#{key}=", value) unless value_diff?(key, asset.send(key), value)
+          elsif value_diff?(key, cached_asset_params[key], value)
+            asset.send(:"#{key}=", value)
+          end
         end
 
         asset.patch! if asset.changed?
@@ -43,6 +47,10 @@ module ForemanLiudeskCMDB
 
       def asset_params
         cmdb_params[:asset]
+      end
+
+      def value_diff?(_key, current, wanted)
+        current != wanted
       end
     end
   end

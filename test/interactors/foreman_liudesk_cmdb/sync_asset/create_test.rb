@@ -39,7 +39,6 @@ class CreateAssetTest < ActiveSupport::TestCase
       stub_post = stub_request(:post, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server").with(
         body: {
           hostName: hostname,
-          networkAccessRole: "None",
           hardwareID: hardware_id,
           operatingSystemType: "N/A",
           operatingSystem: "N/A",
