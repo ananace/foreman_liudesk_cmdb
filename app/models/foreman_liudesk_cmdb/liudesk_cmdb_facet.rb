@@ -4,7 +4,7 @@ module ForemanLiudeskCMDB
   # Main host facet for CMDB asset link
   #
   # Tracks asset and hardware objects separately to ease lookup
-  class LiudeskCMDBFacet < ApplicationRecord
+  class LiudeskCMDBFacet < ApplicationRecord # rubocop:disable Metrics/ClassLength
     # Allow use of asset type in jails
     class Jail < Safemode::Jail
       allow :cached_asset_parameters
@@ -103,9 +103,13 @@ module ForemanLiudeskCMDB
     def asset_will_change?(only: nil)
       return true if asset_type_changed?
       return (asset_params_diff[only] || {}).any? if only
-      return true if (Time.now - (sync_at || Time.now)) >= FULL_RESYNC_INTERVAL
+      return true if out_of_sync?
 
       asset_params_diff.any?
+    end
+
+    def out_of_sync?(multiplier: 1)
+      (Time.now - (sync_at || Time.now)) >= FULL_RESYNC_INTERVAL * multiplier
     end
 
     def asset?

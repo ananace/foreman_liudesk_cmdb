@@ -21,6 +21,9 @@ module ForemanLiudeskCMDB
       Foreman::Plugin.register :foreman_liudesk_cmdb do
         requires_foreman ">= 3.6"
 
+        register_info_provider ForemanLiudeskCMDB::HostInfoProvider
+        register_custom_status HostStatus::CMDBStatus
+
         register_facet ForemanLiudeskCMDB::LiudeskCMDBFacet, :liudesk_cmdb_facet do
           configure_host do
             set_dependent_action :destroy
