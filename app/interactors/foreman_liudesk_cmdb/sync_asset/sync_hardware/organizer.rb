@@ -7,7 +7,9 @@ module ForemanLiudeskCMDB
       class Organizer
         include ::Interactor::Organizer
 
-        after do
+        def call
+          super
+        ensure
           if context.hardware&.retrieved?
             context.raw_data[:hardware] = context.hardware.class.convert_ruby_to_cmdb context.hardware.raw_data!
             context.raw_data[:hardware_type] = context.hardware.class.name.split("::").last._cmdb_snake_case
