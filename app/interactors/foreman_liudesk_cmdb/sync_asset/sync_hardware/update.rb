@@ -45,8 +45,11 @@ module ForemanLiudeskCMDB
 
         def value_diff?(key, current, wanted)
           if key == :mac_and_network_access_roles
-            current.to_h { |val| [(val[:mac] || val["mac"]).downcase, val[:networkAccessRole] || val["networkAccessRole"]] } \
-              != wanted.to_h { |val| [(val[:mac] || val["mac"]).downcase, val[:networkAccessRole] || val["networkAccessRole"]] }
+            cleanup = proc do |val|
+              indifferent = val.with_indifferent_access
+              OpenStruct.new(mac: indifferent[:mac]&.downcase, role: indifferent[:networkAccessRole]) # rubocop:disable Style/OpenStructUse
+            end
+            current&.map(&cleanup)&.sort_by(&:mac) != wanted&.map(&cleanup)&.sort_by(&:mac)
           else
             current != wanted
           end

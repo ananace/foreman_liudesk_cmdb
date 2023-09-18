@@ -24,6 +24,10 @@ class UpdateHardwareTest < ActiveSupport::TestCase
       model: "ProLiant DL480 Gen8",
       mac_and_network_access_roles: [
         {
+          mac: "00:01:02:03:04:06",
+          networkAccessRole: "None"
+        },
+        {
           mac: "00:01:02:03:04:05",
           networkAccessRole: "None"
         }
@@ -58,6 +62,7 @@ class UpdateHardwareTest < ActiveSupport::TestCase
         "uuid" => "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
       )
       host.interfaces.new mac: "00:01:02:03:04:05"
+      host.interfaces.new mac: "00:01:02:03:04:06"
 
       facet = host.build_liudesk_cmdb_facet
       facet.asset_type = asset_type
@@ -88,6 +93,33 @@ class UpdateHardwareTest < ActiveSupport::TestCase
     end
   end
 
+  context "when hardware has odd hash keys" do
+    let(:wanted_hardware_data) do
+      {
+        guid: hardware_id,
+        make: "HP",
+        model: "ProLiant DL480 Gen8",
+        mac_and_network_access_roles: [
+          {
+            "mac" => "00:01:02:03:04:06",
+            "networkAccessRole" => "None"
+          },
+          {
+            "mac" => "00:01:02:03:04:05",
+            "networkAccessRole" => "None"
+          }
+        ],
+        serial_number: "abc123",
+        bios_uuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
+      }
+    end
+
+    it "acts correctly" do
+      assert subject.success?
+      refute_requested stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{hardware.api_url}")
+    end
+  end
+
   context "when hardware is modified" do
     let(:raw_data) { { hardware: current_hardware_data } }
 
@@ -98,6 +130,10 @@ class UpdateHardwareTest < ActiveSupport::TestCase
         macAndNetworkAccessRoles: [
           {
             mac: "00:01:02:03:04:05",
+            networkAccessRole: "None"
+          },
+          {
+            mac: "00:01:02:03:04:06",
             networkAccessRole: "None"
           }
         ]
