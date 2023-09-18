@@ -59,20 +59,24 @@ module ForemanLiudeskCMDB
         &.[]("hardware_fallback_role")
     end
 
+    def server?
+      asset_type.to_s.downcase == "server"
+    end
+
     def client?
-      asset_type.to_s != "server"
+      !server?
     end
 
     def asset_parameter_keys
       base = %i[
-        hostname network_access_role
+        hostname
         operating_system_type operating_system operating_system_install_date
         management_system management_system_id
       ]
-      base + if client?
-               %i[certificate_information network_certificate_ca]
-             else
+      base + if server?
                %i[foreman_link]
+             else
+               %i[certificate_information network_access_role network_certificate_ca]
              end
     end
 
