@@ -31,7 +31,7 @@ module ForemanLiudeskCMDB
       end
 
       def thin?
-        (Time.now - facet.sync_at) < ForemanLiudeskCMDB::LiudeskCMDBFacet::FULL_RESYNC_INTERVAL
+        (Time.now - (facet.sync_at || Time.now)) < ForemanLiudeskCMDB::LiudeskCMDBFacet::FULL_RESYNC_INTERVAL
       end
     end
   end

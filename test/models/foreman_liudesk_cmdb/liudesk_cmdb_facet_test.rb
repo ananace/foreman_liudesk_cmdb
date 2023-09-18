@@ -22,7 +22,8 @@ module Host
         raw_data["asset"]["management_system_id"] = "#{SETTINGS[:fqdn]}/#{host.id}"
         raw_data["hardware"]["mac_and_network_access_roles"] = [
           {
-            "mac" => host.primary_interface.mac.upcase
+            "mac" => host.primary_interface.mac.upcase,
+            "networkAccessRole" => "None"
           }
         ]
         host.liudesk_cmdb_facet.clear_changes_information

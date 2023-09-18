@@ -11,8 +11,9 @@ module ForemanLiudeskCMDB
       end
 
       def call
+        # FIXME: This is temporary until deprecation supports MAC reuse
         context.hardware.mac_and_network_access_roles = nil
-        context.hardware.patch!
+        context.hardware.patch! if context.hardware.changed?
 
         context.hardware.delete!
       rescue StandardError => e

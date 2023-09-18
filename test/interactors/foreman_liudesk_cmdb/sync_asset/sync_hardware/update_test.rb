@@ -94,7 +94,13 @@ class UpdateHardwareTest < ActiveSupport::TestCase
     it "updates hardware" do
       updated = {
         serialNumber: "abc123",
-        biosUuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
+        biosUuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8",
+        macAndNetworkAccessRoles: [
+          {
+            mac: "00:01:02:03:04:05",
+            networkAccessRole: "None"
+          }
+        ]
       }
       stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{hardware.api_url}").with(
         body: updated

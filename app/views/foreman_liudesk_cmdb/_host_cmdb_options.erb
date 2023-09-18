@@ -11,13 +11,16 @@
     facet ||= item&.build_liudesk_cmdb_facet(hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])) if inherited && hostgroup
   end
   inherited ||= true if facet.nil?
+
+  asset_types = [ ['server', 'Server'], ['client', 'Client'], ['computerlab', 'Computerlab'] ]
+  asset_types << [facet.asset_type.to_s.downcase, facet.asset_type] if facet&.asset_type && !asset_types.any? { |type| type.first == facet.asset_type.to_s.downcase }
 -%>
 
 <%= javascript 'foreman_liudesk_cmdb/host_edit_extensions.js' %>
 
 <%= fields_for item do |f| %>
 <%= f.fields_for 'liudesk_cmdb_facet_attributes' do |f| %>
-<%= select_f(f, :asset_type, [ ['server', 'Server'], ['client', 'Client'] ], :first, :last,
+<%= select_f(f, :asset_type, asset_types, :first, :last,
       { include_blank: true,
         selected: facet&.asset_type,
         disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),

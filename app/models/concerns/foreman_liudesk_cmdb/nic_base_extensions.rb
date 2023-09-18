@@ -14,8 +14,6 @@ module ForemanLiudeskCMDB
     end
 
     def network_access_role=(new_role)
-      puts "For #{self}: Changing role to #{new_role}"
-
       return unless mac
       return unless host&.liudesk_cmdb_facet
 

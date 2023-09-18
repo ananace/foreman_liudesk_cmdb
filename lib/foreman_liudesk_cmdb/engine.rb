@@ -77,6 +77,7 @@ module ForemanLiudeskCMDB
 
     config.to_prepare do
       Nic::Base.include ForemanLiudeskCMDB::NicBaseExtensions
+      HostFactImporter.prepend ForemanLiudeskCMDB::HostFactImporterExtensions
     rescue StandardError => e
       Rails.logger.warn "foreman_liudesk_cmdb: skipping engine hook (#{e})\n#{e.backtrace.join("\n")}"
     end

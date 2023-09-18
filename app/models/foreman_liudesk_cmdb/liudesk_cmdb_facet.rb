@@ -25,12 +25,14 @@ module ForemanLiudeskCMDB
     def asset_model_type
       if asset_type.to_s.downcase == "server"
         :server_v1
-      elsif asset_type.to_s.downcase == "client"
+      elsif %w[client computerlab].include? asset_type.to_s.downcase
         case host.os&.family
         when /^windows/i
-          :windows_client_v1
+          :"windows_#{asset_type}_v1"
+        when /^darwin/i
+          :"mac_#{asset_type}_v1"
         else
-          :linux_client_v1
+          :"linux_#{asset_type}_v1"
         end
       else
         asset_type.to_s.downcase.to_sym
@@ -95,9 +97,9 @@ module ForemanLiudeskCMDB
     end
 
     def asset_will_change?(only: nil)
-      return true if (Time.now - sync_at) >= FULL_RESYNC_INTERVAL
       return true if asset_type_changed?
       return (asset_params_diff[only] || {}).any? if only
+      return true if (Time.now - (sync_at || Time.now)) >= FULL_RESYNC_INTERVAL
 
       asset_params_diff.any?
     end

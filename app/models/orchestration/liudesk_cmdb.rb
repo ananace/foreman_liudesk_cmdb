@@ -23,7 +23,7 @@ module Orchestration
       return true if liudesk_cmdb_facet&.asset_will_change?
       return false if liudesk_cmdb_facet
       return false unless hostgroup
-      return false if hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet]).empty?
+      return false if ForemanLiudeskCMDB::LiudeskCMDBFacet.inherited_attributes(hostgroup, nil).compact.empty?
 
       true
     end

@@ -99,7 +99,6 @@ class UpdateAssetTest < ActiveSupport::TestCase
       host.liudesk_cmdb_facet.network_role = "Guest"
       updated = {
         hostName: hostname,
-        networkAccessRole: "Guest",
         operatingSystemType: "Debian",
         operatingSystem: "Debian 10.0",
         operatingSystemInstallDate: "2021-12-31T23:00:00.000Z",

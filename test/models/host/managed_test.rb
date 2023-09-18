@@ -4,14 +4,17 @@ require "test_plugin_helper"
 
 module Host
   class ManagedTest < ActiveSupport::TestCase
+    include FactImporterIsolation
+    allow_transactions_for_any_importer
+
+    setup do
+      disable_orchestration
+      setup_default_cmdb_settings
+    end
+
     let(:host) { FactoryBot.build(:host, :managed, :with_liudesk_cmdb_facet) }
 
     context "a host with CMDB orchestration" do
-      setup do
-        disable_orchestration
-        setup_default_cmdb_settings
-      end
-
       it "should post_queue CMDB sync" do
         host.save
         tasks = host.post_queue.all.map(&:name)
@@ -104,28 +107,154 @@ module Host
 
         assert_equal "Guest", host.liudesk_cmdb_facet.network_role
       end
+
+      it "should handle network access roles for its interfaces" do
+        refute host.primary_interface.network_access_role
+
+        host.primary_interface.network_access_role = "Guest"
+
+        assert_equal(
+          {
+            host.primary_interface.mac => {
+              "role" => "Guest"
+            }
+          },
+          host.liudesk_cmdb_facet.hardware_network_roles
+        )
+      end
+
+      it "should push asset updates when facts cause changes in asset" do
+        host.liudesk_cmdb_facet.raw_data = host.liudesk_cmdb_facet.asset_parameters
+
+        host.expects(:cmdb_sync_asset)
+
+        HostFactImporter.new(host).import_facts(
+          os: {
+            family: "RedHat",
+            hardware: "x86_64",
+            name: "RedHat",
+            release: {
+              full: "8.8",
+              major: 8,
+              minor: 8
+            }
+          }
+        )
+
+        assert host.liudesk_cmdb_facet.asset_will_change?
+        assert host.cmdb_orchestration_with_inherit?
+      end
+
+      it "should not push asset when facts don't cause changes in asset" do
+        host.id = 999
+        host.liudesk_cmdb_facet.raw_data = host.liudesk_cmdb_facet.asset_parameters
+
+        host.stubs(:cmdb_sync_asset)
+
+        HostFactImporter.new(host).import_facts(
+          os: {
+            family: host.operatingsystem.family,
+            name: host.operatingsystem.name,
+            release: {
+              major: host.operatingsystem.major,
+              minor: host.operatingsystem.minor
+            }
+          },
+          environment: "devel",
+          is_virtual: true,
+          memory: {
+            system: {
+              total_bytes: 1024
+            }
+          },
+          processors: {
+            physicalcount: 2,
+            count: 96
+          },
+          dmi: {
+            bios: {
+              vendor: "example",
+              version: "1.0",
+              release_date: Time.now.strftime("%Y-%m-%d")
+            }
+          }
+        )
+
+        refute host.liudesk_cmdb_facet.asset_will_change?
+        refute host.cmdb_orchestration_with_inherit?
+      end
     end
 
     context "a host in a hostgroup with CMDB orchestration" do
-      let(:hostgroup) { FactoryBot.build(:hostgroup, :with_liudesk_cmdb_facet) }
-      let(:host) { FactoryBot.build(:host, :managed) }
+      let(:hostgroup) do
+        FactoryBot.build(:hostgroup, :with_liudesk_cmdb_facet).tap do |hostgroup|
+          hostgroup.liudesk_cmdb_facet.asset_type = :server
+        end
+      end
+      let(:host) do
+        FactoryBot.build(:host, :managed).tap do |host|
+          host.hostgroup = hostgroup
+        end
+      end
 
-      it "should inherit CMDB configuration" do
-        host.hostgroup = hostgroup
-
+      before(:each) do
         refute host.liudesk_cmdb_facet
         assert hostgroup.liudesk_cmdb_facet
+      end
 
+      it "should inherit CMDB configuration" do
         h_facet = host.liudesk_cmdb_facet!
         hg_facet = hostgroup.liudesk_cmdb_facet
 
         assert h_facet
         assert_equal hg_facet.asset_type, h_facet.asset_type
       end
+
+      it "should push asset on fact upload, regardless of fact data" do
+        assert host.cmdb_orchestration_with_inherit?
+
+        host.expects(:cmdb_sync_asset)
+
+        HostFactImporter.new(host).import_facts(
+          os: {
+            family: "RedHat",
+            hardware: "x86_64",
+            name: "RedHat",
+            release: {
+              full: "8.8",
+              major: 8,
+              minor: 8
+            }
+          },
+          environment: "devel",
+          is_virtual: true,
+          memory: {
+            system: {
+              total_bytes: 1024
+            }
+          },
+          processors: {
+            physicalcount: 2,
+            count: 96
+          },
+          dmi: {
+            bios: {
+              vendor: "example",
+              version: "1.0",
+              release_date: Time.now.strftime("%Y-%m-%d")
+            }
+          }
+        )
+      end
     end
 
     context "a host without CMDB orchestration" do
-      let(:host) { FactoryBot.build(:host, :managed) }
+      let(:hostgroup) { FactoryBot.build(:hostgroup) }
+      let(:host) do
+        FactoryBot.build(:host, :managed).tap do |host|
+          host.hostgroup = hostgroup
+        end
+      end
 
       it "should not post_queue CMDB sync" do
         refute host.liudesk_cmdb_facet
@@ -143,6 +272,25 @@ module Host
         ForemanLiudeskCMDB::ArchiveAsset::Organizer.expects(:call).never
 
         host.destroy
+      end
+
+      it "should not sync asset on fact uploads" do
+        refute host.cmdb_orchestration_with_inherit?
+
+        host.expects(:cmdb_sync_asset).never
+
+        HostFactImporter.new(host).import_facts(
+          os: {
+            family: "RedHat",
+            hardware: "x86_64",
+            name: "RedHat",
+            release: {
+              full: "8.8",
+              major: 8,
+              minor: 8
+            }
+          }
+        )
       end
     end
   end

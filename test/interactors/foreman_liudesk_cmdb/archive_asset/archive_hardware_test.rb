@@ -67,18 +67,58 @@ class ArchiveHardwareTest < ActiveSupport::TestCase
       end
 
       it "deprecates the attached hardware" do
-        stub_delete = stub_request(:delete, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}").to_return( # rubocop:disable Layout/LineLength
+        stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}").to_return(
+          status: 200,
+          body: {
+            guid: "#{hardware_id}-changed"
+          }.to_json
+        )
+        stub_delete = stub_request(:delete, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}-changed").to_return(
           status: 200
         )
 
         assert subject.success?
+        assert_requested stub_patch
         assert_requested stub_delete
       end
 
       it "handles failures correctly" do
-        hardware.expects(:delete!).raises(StandardError)
+        stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}").to_return(
+          status: 422,
+          body: {}.to_json
+        )
 
         refute subject.success?
+
+        assert_requested stub_patch
+      end
+
+      context "when MAC address is assigned" do
+        let(:hardware) do
+          LiudeskCMDB::Models::HardwareV1.new(
+            ForemanLiudeskCMDB::API.client,
+            hardware_id,
+            mac_and_network_access_roles: [
+              { mac: "01:02:03:04:05:06", networkAccessRole: "None" }
+            ]
+          )
+        end
+
+        it "removes MACs and deprecates the attached hardware" do
+          stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}").to_return(
+            status: 200,
+            body: {
+              guid: hardware_id
+            }.to_json
+          )
+          stub_delete = stub_request(:delete, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}").to_return(
+            status: 200
+          )
+
+          assert subject.success?
+          assert_requested stub_patch
+          assert_requested stub_delete
+        end
       end
     end
   end

@@ -57,7 +57,7 @@ class ArchiveAssetTest < ActiveSupport::TestCase
           hostName: "modified-hostname"
         }.to_json
       )
-      stub_delete = stub_request(:delete, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server/modified-hostname").to_return( # rubocop:disable Layout/LineLength
+      stub_delete = stub_request(:delete, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server/modified-hostname").to_return(
         status: 200
       )
 
