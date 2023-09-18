@@ -45,8 +45,8 @@ module ForemanLiudeskCMDB
 
         def value_diff?(key, current, wanted)
           if key == :mac_and_network_access_roles
-            current.to_h { |val| [val[:mac].downcase, val[:networkAccessRole]] } \
-              != wanted.to_h { |val| [val[:mac].downcase, val[:networkAccessRole]] }
+            current.to_h { |val| [(val[:mac] || val["mac"]).downcase, val[:networkAccessRole] || val["networkAccessRole"]] } \
+              != wanted.to_h { |val| [(val[:mac] || val["mac"]).downcase, val[:networkAccessRole] || val["networkAccessRole"]] }
           else
             current != wanted
           end
