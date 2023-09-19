@@ -83,7 +83,10 @@ module ForemanLiudeskCMDB
     end
 
     def find_hardware_make
-      { make: host.facts["dmi::manufacturer"] || host.facts["manufacturer"] || "N/A" }
+      manufacturer = host.facts["dmi::manufacturer"] || host.facts["manufacturer"] || "N/A"
+      manufacturer = manufacturer.sub(%r{ // .+$}, "") # Make FUJITSU friendlier in CMDB
+
+      { make: manufacturer }
     end
 
     def find_hardware_model
