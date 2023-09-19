@@ -48,12 +48,22 @@ module ForemanLiudeskCMDB
 
     def cleanup_asset(data)
       # Avoid pushing impossible role changes
-      data.delete :network_access_role unless @active[:certificate_information]
+      data.delete :network_access_role unless @active.dig(:asset, :certificate_information)
+      # data.delete :network_access_role if data[:network_access_role]
+
+      # Ignore case difference on OS type, LiUDesk likes to capitalize the input data
+      case_issues = %i[operating_system_type]
+      case_issues.each do |key|
+        data.delete key if data[key]&.downcase == @cached.dig(:asset, key)&.downcase
+      end
     end
 
     def cleanup_hardware(data)
       # Ignore case difference on hardware make, LiUDesk likes to capitalize the input data
-      data.delete :make if data[:make]&.downcase == @active[:make]&.downcase
+      case_issues = %i[make]
+      case_issues.each do |key|
+        data.delete key if data[key]&.downcase == @cached.dig(:hardware, key)&.downcase
+      end
     end
   end
 end

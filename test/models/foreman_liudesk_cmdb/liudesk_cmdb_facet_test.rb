@@ -53,6 +53,7 @@ module Host
         host.stubs(:facts).returns(
           "manufacturer" => "example manufacturer"
         )
+
         assert host.liudesk_cmdb_facet.asset_will_change? only: :hardware
         refute host.liudesk_cmdb_facet.asset_will_change? only: :asset
       end

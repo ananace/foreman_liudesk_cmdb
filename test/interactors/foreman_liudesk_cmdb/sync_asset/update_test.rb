@@ -53,6 +53,7 @@ class UpdateAssetTest < ActiveSupport::TestCase
         os.title = "Debian 10.0"
       end
       host.installed_at = Time.utc(2021, 12, 31, 23, 0, 0)
+      host.certname = hostname
       host.managed = true
       host.id = 1
 
@@ -126,6 +127,73 @@ class UpdateAssetTest < ActiveSupport::TestCase
       )
 
       refute subject.success?
+      assert_requested(stub_patch)
+    end
+  end
+
+  context "when NAC data is modified" do
+    let(:asset_type) { "client" }
+    let(:asset) do
+      LiudeskCMDB::Models::LinuxClientV1.new(
+        ForemanLiudeskCMDB::API.client,
+        asset_id
+      )
+    end
+    let(:network_role) { "None" }
+    let(:current_asset_data) do
+      {
+        certificate_information: hostname,
+        hostname: hostname,
+        hardware_id: hardware_id,
+        network_access_role: "None",
+        network_certificate_ca: "PUPPETCA",
+        operating_system: "Debian 10.0",
+        operating_system_type: "Debian",
+        operating_system_install_date: "2021-12-31T23:00:00.000Z",
+        management_system: "ITI-Foreman",
+        management_system_id: "foreman.example.com/1"
+      }
+    end
+    let(:raw_data) do
+      {
+        asset: current_asset_data,
+        asset_type: "linux_client_v1",
+        hardware: {
+          make: "N/A",
+          model: "N/A",
+          mac_and_network_access_roles: []
+        },
+        hardware_type: "hardware_v1"
+      }
+    end
+
+    it "attaches all necessary NAC keys, even if unmodified" do
+      host.liudesk_cmdb_facet.network_role = "Guest"
+
+      assert_equal(
+        {
+          asset: {
+            network_access_role: "Guest"
+          }
+        },
+        host.liudesk_cmdb_facet.asset_params_diff
+      )
+
+      updated = {
+        networkAccessRole: "Guest",
+        certificateInformation: hostname,
+        networkCertificateCa: "PUPPETCA"
+      }
+      stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{asset.api_url}").with(
+        body: updated
+      ).to_return(
+        status: 200,
+        body: updated.merge(
+          hardwareID: hardware_id
+        ).to_json
+      )
+
+      assert subject.success?
       assert_requested(stub_patch)
     end
   end

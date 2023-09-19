@@ -46,7 +46,7 @@ module ForemanLiudeskCMDB
       role = nil unless facet.asset_parameter_keys.include? :certificate_information
 
       {
-        network_access_role: role || "None"
+        network_access_role: role
       }.compact
     end
 

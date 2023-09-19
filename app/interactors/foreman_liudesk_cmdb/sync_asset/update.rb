@@ -19,6 +19,15 @@ module ForemanLiudeskCMDB
           end
         end
 
+        # Always push all NAC keys if any is changed, to work around CMDB API issues
+        nac_keys = %i[network_access_role certificate_information network_certificate_ca]
+        if nac_keys.any? { |key| asset.changed?(key) } && nac_keys.all? { |key| asset.respond_to?(key) }
+          nac_keys.each do |key|
+            asset.instance_variable_get(:@old_data).delete key
+            asset.send :"#{key}=", asset_params[key]
+          end
+        end
+
         asset.patch! if asset.changed?
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
