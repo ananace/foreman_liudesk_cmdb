@@ -65,7 +65,9 @@ module ForemanLiudeskCMDB
         cmdb_params[:asset]
       end
 
-      def value_diff?(_key, current, wanted)
+      def value_diff?(key, current, wanted)
+        return current&.downcase != wanted&.downcase if key == :operating_system_type
+
         current != wanted
       end
     end
