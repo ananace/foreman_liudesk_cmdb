@@ -38,7 +38,7 @@ module ForemanLiudeskCMDB
         def search_params
           cmdb_params[:hardware]
             .slice(:bios_uuid, :serial_number)
-            .merge("macAndNetworkAccessRoles.mac": host.mac.upcase)
+            .merge("macAndNetworkAccessRoles.mac": host.mac&.upcase)
             .reject { |_, v| v.nil? || v.empty? }
         end
       end
