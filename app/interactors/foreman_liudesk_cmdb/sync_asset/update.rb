@@ -29,6 +29,13 @@ module ForemanLiudeskCMDB
         end
 
         asset.patch! if asset.changed?
+      rescue LiudeskCMDB::NotFoundError => e
+        ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
+                          .error("#{self.class} error #{e}, resetting asset id")
+
+        facet.update asset_id: nil
+
+        context.fail!(error: "#{self.class}: #{e}")
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
