@@ -13,6 +13,20 @@ module ForemanLiudeskCMDB
 
         def call
           context.hardware = ForemanLiudeskCMDB::API.create_asset(:hardware_v1, **cmdb_params[:hardware])
+        rescue LiudeskCMDB::UnprocessableError => e
+          ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
+                            .warn("#{self.class} error #{e}, attempting with only primary interface: #{e.backtrace}")
+
+          cleaned_params = cmdb_params[:hardware]
+          primary = context.host.primary_interface
+          cleaned_params[:mac_and_network_access_roles] = [
+            {
+              mac: primary.mac,
+              networkAccessRole: primary.deep_network_access_role || "None"
+            }
+          ]
+
+          context.hardware = ForemanLiudeskCMDB::API.create_asset(:hardware_v1, **cleaned_params)
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")

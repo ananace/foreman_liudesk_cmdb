@@ -13,6 +13,14 @@ module ForemanLiudeskCMDB
       roles[mac.downcase]&.fetch("role", nil)
     end
 
+    def deep_network_access_role
+      role = network_access_role \
+             || host&.liudesk_cmdb_facet&.deep_hardware_fallback_role
+      return nil if role.nil? || role.empty?
+
+      role
+    end
+
     def network_access_role=(new_role)
       return unless mac
       return unless host&.liudesk_cmdb_facet

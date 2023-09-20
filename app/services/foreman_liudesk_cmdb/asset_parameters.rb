@@ -110,19 +110,14 @@ module ForemanLiudeskCMDB
     def find_hardware_mac_and_network_access_roles
       roles = {}
       host.interfaces.select { |iface| iface&.mac }.compact.each do |iface|
-        role = iface.network_access_role
-        role = nil if role&.empty?
-
-        roles[iface.mac.upcase] ||= role ||
-                                    facet.deep_hardware_fallback_role ||
-                                    "None"
+        roles[iface.mac.upcase] ||= iface.deep_network_access_role
       end
 
       {
         mac_and_network_access_roles: roles.map do |mac, role|
           {
             mac: mac,
-            networkAccessRole: role
+            networkAccessRole: role || "None"
           }.compact
         end
       }
