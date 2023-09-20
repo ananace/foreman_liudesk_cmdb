@@ -18,8 +18,8 @@ module ForemanLiudeskCMDB
 
         organize SyncHardware::FindThin,
                  SyncHardware::Find,
-                 SyncHardware::Create,
                  SyncHardware::Update,
+                 SyncHardware::Create,
                  SyncHardware::UpdateFacet
       end
     end

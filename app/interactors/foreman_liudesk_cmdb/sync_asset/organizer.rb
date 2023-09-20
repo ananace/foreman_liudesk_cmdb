@@ -16,8 +16,8 @@ module ForemanLiudeskCMDB
                SyncAsset::AttachThin,
                SyncAsset::Find,
                SyncAsset::RemoveOnTypeChange,
-               SyncAsset::Create,
                SyncAsset::Update,
+               SyncAsset::Create,
                SyncAsset::UpdateFacet
 
       def call
