@@ -112,6 +112,10 @@ module ForemanLiudeskCMDB
       (Time.now - (sync_at || Time.now)) >= FULL_RESYNC_INTERVAL * multiplier
     end
 
+    def force_resync!
+      update sync_at: Time.at(0)
+    end
+
     def asset?
       !asset_id.nil?
     end
