@@ -25,7 +25,10 @@ class CreateHardwareTest < ActiveSupport::TestCase
         "productname" => "HP ProLiant DL480 Gen8",
         "uuid" => "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
       )
-      host.interfaces.new mac: "00:01:02:03:04:05"
+      host.primary_interface.tap do |iface|
+        iface.mac = "00:01:02:03:04:05"
+      end
+      host.interfaces.new mac: "00:01:02:03:04:06"
 
       facet = host.build_liudesk_cmdb_facet
       facet.asset_type = asset_type
@@ -45,13 +48,14 @@ class CreateHardwareTest < ActiveSupport::TestCase
       stub_post = stub_request(:post, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware").with(
         body: {
           macAndNetworkAccessRoles: [
-            { mac: "00:01:02:03:04:05", networkAccessRole: "None" }
+            { mac: "00:01:02:03:04:05", networkAccessRole: "None" },
+            { mac: "00:01:02:03:04:06", networkAccessRole: "None" }
           ],
           make: "HP",
           model: "ProLiant DL480 Gen8",
           serialNumber: "abc123",
           biosUuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
-        }.to_json
+        }
       ).to_return(
         status: 201,
         body: {
@@ -62,6 +66,46 @@ class CreateHardwareTest < ActiveSupport::TestCase
       assert subject.success?
       assert_equal hardware_id, subject.hardware.identifier
       assert_requested stub_post
+    end
+
+    it "handles MAC collisions gracefully" do
+      stub_post = stub_request(:post, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware").with(
+        body: {
+          macAndNetworkAccessRoles: [
+            { mac: "00:01:02:03:04:05", networkAccessRole: "None" },
+            { mac: "00:01:02:03:04:06", networkAccessRole: "None" }
+          ],
+          make: "HP",
+          model: "ProLiant DL480 Gen8",
+          serialNumber: "abc123",
+          biosUuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
+        }
+      ).to_return(
+        status: 422,
+        body: {}.to_json
+      )
+      stub_post2 = stub_request(:post, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware").with(
+        body: {
+          macAndNetworkAccessRoles: [
+            { mac: "00:01:02:03:04:05", networkAccessRole: "None" }
+          ],
+          make: "HP",
+          model: "ProLiant DL480 Gen8",
+          serialNumber: "abc123",
+          biosUuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8"
+        }
+      ).to_return(
+        status: 201,
+        body: {
+          guid: hardware_id
+        }.to_json
+      )
+
+      assert subject.success?
+      assert subject.hardware
+
+      assert_requested stub_post
+      assert_requested stub_post2
     end
 
     it "handles errors correctly" do
