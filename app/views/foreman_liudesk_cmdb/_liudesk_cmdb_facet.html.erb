@@ -3,7 +3,7 @@ asset_data = ForemanLiudeskCMDB::CachedAssetParameters.call(@host, sliced: false
 asset_keys = %i[network_access_role certificate_information network_certificate_ca]
 facet = @host.liudesk_cmdb_facet
 -%>
-<div class="additional-info ca w-100">Last synced <span title="<%= facet.sync_at %>"><%= time_ago_in_words(facet.sync_at) %> ago</span>
+<div class="additional-info ca w-100">Last synced <span title="<%= facet.sync_at %>"><%= time_ago_in_words(facet.sync_at || Time.at(0)) %> ago</span>
 <%-
   if facet.sync_error
 -%>

@@ -66,7 +66,11 @@ module Orchestration
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .info("Syncing CMDB data for #{name}")
 
-      ForemanLiudeskCMDB::SyncAsset::Organizer.call(host: self)
+      res = ForemanLiudeskCMDB::SyncAsset::Organizer.call(host: self)
+      unless res.success?
+        ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
+                          .error("Failed to sync CMDB asset for #{name}. #{res.error}")
+      end
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .error("Failed to sync CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")
