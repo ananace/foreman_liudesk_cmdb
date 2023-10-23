@@ -47,16 +47,16 @@ module ForemanLiudeskCMDB
       return network_role unless network_role.nil? || network_role.empty?
 
       host.hostgroup
-        &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
-        &.[]("network_role")
+          &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
+          &.[]("network_role")
     end
 
     def deep_hardware_fallback_role
       return hardware_fallback_role unless hardware_fallback_role.nil? || hardware_fallback_role.empty?
 
       host.hostgroup
-        &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
-        &.[]("hardware_fallback_role")
+          &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
+          &.[]("hardware_fallback_role")
     end
 
     def server?
