@@ -7,8 +7,8 @@ module ForemanLiudeskCMDB
 
     def parse_facts(facts, type, source_proxy)
       super
-
-      host.cmdb_sync_asset if host.cmdb_orchestration_with_inherit?
+    ensure
+      host.cmdb_sync_asset if host.try :cmdb_orchestration_with_inherit?
     end
   end
 end
