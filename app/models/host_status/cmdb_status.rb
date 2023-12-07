@@ -16,7 +16,7 @@ module HostStatus
       when OK
         HostStatus::Global::OK
       when ERRORED
-        HostStatus::Global::ERRORED
+        HostStatus::Global::ERROR
       else
         HostStatus::Global::WARN
       end
