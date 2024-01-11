@@ -136,6 +136,11 @@ module ForemanLiudeskCMDB
       ForemanLiudeskCMDB::API.get_asset(hardware_model_type, hardware_id)
     end
 
+    # FOREMAN-37043
+    def self.inherited_attributes(hostgroup, facet_attributes)
+      facet_attribute.merge(super) { |_, left, right| left || right }
+    end
+
     private
 
     def cleanup_hardware_network_roles
