@@ -31,6 +31,8 @@ module Orchestration
     def queue_cmdb_sync
       return unless errors.empty?
 
+      # Ensure there's a CMDB facet attached
+      liudesk_cmdb_facet!
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .info("Queued sync of CMDB data for #{name}, changing: #{asset_params_diff}")
 
