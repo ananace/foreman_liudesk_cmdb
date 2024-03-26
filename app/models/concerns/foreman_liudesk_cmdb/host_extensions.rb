@@ -15,8 +15,9 @@ module ForemanLiudeskCMDB
       return liudesk_cmdb_facet if liudesk_cmdb_facet && attrs.empty?
 
       attrs = liudesk_cmdb_facet.attributes.merge(attrs) if liudesk_cmdb_facet
-      attrs = hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet]).merge(attrs) \
-        if hostgroup
+      if hostgroup
+        attrs = hostgroup.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet]).merge(attrs)
+      end
 
       if liudesk_cmdb_facet
         f = liudesk_cmdb_facet

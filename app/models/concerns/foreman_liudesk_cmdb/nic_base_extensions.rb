@@ -14,8 +14,8 @@ module ForemanLiudeskCMDB
     end
 
     def deep_network_access_role
-      role = network_access_role \
-             || host&.liudesk_cmdb_facet&.deep_hardware_fallback_role
+      role = network_access_role ||
+             host&.liudesk_cmdb_facet&.deep_hardware_fallback_role
       return nil if role.nil? || role.empty?
 
       role
