@@ -62,11 +62,6 @@ module ForemanLiudeskCMDB
                     default: false,
                     full_name: N_("CMDB Orchestration"),
                     description: N_("Enable CMDB Orchestration")
-            setting :liudesk_cmdb_orchestration_blocking,
-                    type: :boolean,
-                    default: false,
-                    full_name: N_("Wait for CMDB Orchestration"),
-                    description: N_("Causes CMDB Orchestration to wait until finished for all host edits")
           end
         end
 
