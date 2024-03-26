@@ -3,6 +3,10 @@ AllCops:
   TargetRubyVersion: 2.7
   NewCops: enable
 
+# Rails convention uses the parameter f for fields in view helpers
+Naming/MethodParameterName:
+  Exclude: 'app/helpers/**/*.rb'
+
 Style/ClassAndModuleChildren:
   Enabled: false
 
@@ -25,3 +29,4 @@ Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
+
