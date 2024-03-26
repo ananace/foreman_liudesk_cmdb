@@ -5,7 +5,8 @@ AllCops:
 
 # Rails convention uses the parameter f for fields in view helpers
 Naming/MethodParameterName:
-  Exclude: 'app/helpers/**/*.rb'
+  Exclude:
+    - 'app/helpers/**/*.rb'
 
 Style/ClassAndModuleChildren:
   Enabled: false
