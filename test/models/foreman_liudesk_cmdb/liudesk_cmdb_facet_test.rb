@@ -9,12 +9,14 @@ module Host
     end
     let(:host) do
       FactoryBot.build(:host, :managed, :with_liudesk_cmdb_facet).tap do |host|
+        host.liudesk_cmdb_facet.asset_type = "server"
         host.liudesk_cmdb_facet.raw_data = raw_data
       end
     end
 
     context "with host data stored" do
       setup do
+        raw_data["asset"]["foreman_link"] = "https://foreman.example.com/hosts/"
         raw_data["asset"]["hostname"] = host.name
         raw_data["asset"]["certificate_information"] = host.name
         raw_data["asset"]["operating_system"] = host.os.title
@@ -56,6 +58,16 @@ module Host
 
         assert host.liudesk_cmdb_facet.asset_will_change? only: :hardware
         refute host.liudesk_cmdb_facet.asset_will_change? only: :asset
+      end
+      it "will consider data in ephemeral fields to be changes" do
+        host.liudesk_cmdb_facet.set_ephemeral :asset, :misc_information, "Just a test value"
+
+        assert host.liudesk_cmdb_facet.asset_will_change?
+      end
+      it "will consider nil data in ephemeral fields to be changes" do
+        host.liudesk_cmdb_facet.set_ephemeral :asset, :misc_information, nil
+
+        assert host.liudesk_cmdb_facet.asset_will_change?
       end
     end
   end

@@ -26,7 +26,7 @@ module Host
         assert_valid host
         host.queue.clear
 
-        ForemanLiudeskCMDB::ArchiveAsset::Organizer.expects(:call).with(host: host)
+        ForemanLiudeskCMDB::ArchiveAsset::Organizer.expects(:call!).with(host: host)
 
         host.destroy
       end
@@ -182,6 +182,42 @@ module Host
 
         refute host.liudesk_cmdb_facet.asset_will_change?
         refute host.cmdb_orchestration_with_inherit?
+      end
+
+      it "should consider ephemeral attributes to be changes in addition to fact-based changes" do
+        host.liudesk_cmdb_facet.raw_data = host.liudesk_cmdb_facet.asset_parameters
+        host.liudesk_cmdb_facet.asset_type = :server
+        host.liudesk_cmdb_facet.clear_changes_information
+
+        assert_equal({}, host.liudesk_cmdb_facet.asset_params_diff)
+        refute host.liudesk_cmdb_facet.asset_will_change?
+
+        host.liudesk_cmdb_facet.ephemeral_attributes = { asset: { misc_information: "Testing" } }
+
+        assert_equal({ asset: { misc_information: "Testing" } }, host.liudesk_cmdb_facet.asset_params_diff)
+        assert host.liudesk_cmdb_facet.asset_will_change?
+
+        host.stubs(:save)
+        host.expects(:cmdb_sync_asset)
+        HostFactImporter.new(host).import_facts(
+          os: {
+            family: "RedHat",
+            hardware: "x86_64",
+            name: "RedHat",
+            release: {
+              full: "8.8",
+              major: 8,
+              minor: 8
+            }
+          }
+        )
+
+        assert_equal(
+          { asset: { operating_system_type: "RedHat", operating_system: "RedHat 8.8", misc_information: "Testing" }, hardware: { mac_and_network_access_roles: [] } },
+          host.liudesk_cmdb_facet.asset_params_diff
+        )
+        assert host.liudesk_cmdb_facet.asset_will_change?
+        assert host.cmdb_orchestration_with_inherit?
       end
     end
 

@@ -11,7 +11,7 @@ module ForemanLiudeskCMDB
       end
 
       def call
-        asset_params.slice(*update_params).each do |key, value|
+        asset_params.slice(*update_params).merge(ephemeral_asset_params).each do |key, value|
           if asset.retrieved?
             asset.send(:"#{key}=", value) unless value_diff?(key, asset.send(key), value)
           elsif value_diff?(key, cached_asset_params[key], value)
@@ -59,6 +59,10 @@ module ForemanLiudeskCMDB
 
       def cached_asset_params
         cached_params[:asset]
+      end
+
+      def ephemeral_asset_params
+        facet.ephemeral_attributes[:asset]
       end
 
       def asset_params

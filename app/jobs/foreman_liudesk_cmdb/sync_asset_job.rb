@@ -5,8 +5,16 @@ module ForemanLiudeskCMDB
   class SyncAssetJob < ::ApplicationJob
     queue_as :cmdb_queue
 
-    def perform(host_id)
-      Host.find(host_id)&.cmdb_sync_asset_blocking
+    def perform(host_id, ephemeral_attributes: nil)
+      host = Host.find(host_id)
+      return unless host
+
+      if ephemeral_attributes
+        host.liudesk_cmdb_facet!
+        host.liudesk_cmdb_facet.ephemeral_attributes = ephemeral_attributes
+      end
+
+      host.cmdb_sync_asset_blocking
     end
 
     rescue_from(StandardError) do |error|

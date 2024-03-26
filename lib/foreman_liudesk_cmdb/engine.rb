@@ -36,8 +36,9 @@ module ForemanLiudeskCMDB
           end
         end
 
-        parameter_filter Host::Managed, liudesk_cmdb_facet_attributes: %i[
-          asset_type hardware_fallback_role hardware_network_roles network_role
+        parameter_filter Host::Managed, liudesk_cmdb_facet_attributes: [
+          :asset_type, :hardware_fallback_role, :hardware_network_roles, :network_role,
+          { ephemeral_attributes: [{ asset: {} }, { hardware: {} }] }
         ]
         parameter_filter Hostgroup, liudesk_cmdb_facet_attributes: %i[
           asset_type hardware_fallback_role network_role
@@ -61,11 +62,40 @@ module ForemanLiudeskCMDB
                     default: false,
                     full_name: N_("CMDB Orchestration"),
                     description: N_("Enable CMDB Orchestration")
+            setting :liudesk_cmdb_orchestration_blocking,
+                    type: :boolean,
+                    default: false,
+                    full_name: N_("Wait for CMDB Orchestration"),
+                    description: N_("Causes CMDB Orchestration to wait until finished for all host edits")
           end
         end
 
         logger :sync, enabled: true
 
+        extend_page("hosts/_form") do |ctx|
+          ctx.add_pagelet(
+            :main_tabs,
+            id: :cmdb,
+            name: _("CMDB"),
+            partial: "hosts/form_liudesk_cmdb_tab",
+            priority: 9001,
+            onlyif: lambda do |host, _context|
+              # Skip rendering tab
+              host.liudesk_cmdb_facet && caller.none? { |call| call.include?("block in render_tab_header_for") }
+            end
+          )
+
+          ctx.add_pagelet(
+            :main_tab_fields,
+            partial: "foreman_liudesk_cmdb/host_cmdb_options"
+          )
+        end
+        extend_page("hostgroups/_form") do |ctx|
+          ctx.add_pagelet(
+            :main_tab_fields,
+            partial: "foreman_liudesk_cmdb/host_cmdb_options"
+          )
+        end
         extend_page("hosts/show") do |ctx|
           ctx.add_pagelet(
             :main_tabs,

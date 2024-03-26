@@ -7,6 +7,7 @@ module ForemanLiudeskCMDB
   class LiudeskCMDBFacet < ApplicationRecord # rubocop:disable Metrics/ClassLength
     # Allow use of asset type in jails
     class Jail < Safemode::Jail
+      allow :asset_parameters
       allow :cached_asset_parameters
     end
 
@@ -21,6 +22,43 @@ module ForemanLiudeskCMDB
     validates :asset_type, presence: true
 
     before_save :cleanup_hardware_network_roles
+
+    # Ephemeral attribute handling
+    #
+
+    attr_reader :ephemeral_attributes
+
+    after_initialize { |_| clear_ephemeral! }
+
+    def set_ephemeral(section, key, value)
+      raise ArgumentError, "Section must be one of #{ephemeral_attributes.keys.inspect}" \
+        unless ephemeral_attributes.keys.include? section
+
+      ephemeral_attributes[section][key] = value
+    end
+
+    def ephemeral_attributes=(attrs)
+      attrs = attrs.slice(*ephemeral_attributes.keys).deep_symbolize_keys
+      existing = (raw_data || { asset: {}, hardware: {} }).deep_symbolize_keys
+
+      attrs.each do |section, params|
+        params.transform_values! { |value| value.nil? ? "" : value }
+        params.delete_if { |param_name, param_value| (existing.dig(section, param_name) || "") == param_value }
+      end
+
+      @ephemeral_attributes.merge! attrs.deep_symbolize_keys
+    end
+
+    def ephemeral_attributes_any?
+      @ephemeral_attributes.any? { |_, v| v.any? }
+    end
+
+    def clear_ephemeral!
+      @ephemeral_attributes = { asset: {}, hardware: {} }
+    end
+
+    # Asset type handling
+    #
 
     def asset_model_type
       if asset_type.to_s.downcase == "server"
@@ -43,37 +81,29 @@ module ForemanLiudeskCMDB
       :hardware_v1
     end
 
-    def deep_network_role
-      return network_role unless network_role.nil? || network_role.empty?
-
-      host.hostgroup
-          &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
-          &.[]("network_role")
-    end
-
-    def deep_hardware_fallback_role
-      return hardware_fallback_role unless hardware_fallback_role.nil? || hardware_fallback_role.empty?
-
-      host.hostgroup
-          &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
-          &.[]("hardware_fallback_role")
-    end
-
+    # Type checks
     def server?
-      asset_type.to_s.downcase == "server"
+      asset_model_type.to_s =~ /server_/
+    end
+
+    def computerlab?
+      asset_model_type.to_s =~ /_computerlab_/
     end
 
     def client?
-      !server?
+      asset_model_type.to_s =~ /_client_/
     end
 
+    # Model parameter handling
+    #
+
     def asset_parameter_keys
-      base = %i[
+      keys = %i[
         hostname
         operating_system_type operating_system operating_system_install_date
         management_system management_system_id
       ]
-      base + if server?
+      keys + if server?
                %i[foreman_link]
              else
                %i[certificate_information network_access_role network_certificate_ca]
@@ -97,11 +127,37 @@ module ForemanLiudeskCMDB
     end
 
     def asset_params_diff
-      ForemanLiudeskCMDB::AssetParameterDifference.call(host)
+      ForemanLiudeskCMDB::AssetParameterDifference
+        .call(host)
+        .deep_merge(ephemeral_attributes)
+        .delete_if { |_, v| v.empty? }
     end
+
+    # Meta-parameter generation
+    #
+
+    def deep_network_role
+      return network_role unless network_role.nil? || network_role.empty?
+
+      host.hostgroup
+          &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
+          &.[]("network_role")
+    end
+
+    def deep_hardware_fallback_role
+      return hardware_fallback_role unless hardware_fallback_role.nil? || hardware_fallback_role.empty?
+
+      host.hostgroup
+          &.inherited_facet_attributes(Facets.registered_facets[:liudesk_cmdb_facet])
+          &.[]("hardware_fallback_role")
+    end
+
+    # Sync helpers
+    #
 
     def asset_will_change?(only: nil)
       return true if asset_type_changed?
+      return true if ephemeral_attributes.any? { |_, data| data.any? }
       return (asset_params_diff[only] || {}).any? if only
       return true if out_of_sync?
 
@@ -115,6 +171,9 @@ module ForemanLiudeskCMDB
     def force_resync!
       update sync_at: Time.at(0)
     end
+
+    # CMDB asset retrieval
+    #
 
     def asset?
       !asset_id.nil?

@@ -56,7 +56,13 @@ module Orchestration
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .info("Syncing CMDB data for #{name}")
 
-      ForemanLiudeskCMDB::SyncAssetJob.perform_later(id)
+      params = {
+        ephemeral_attributes: liudesk_cmdb_facet.ephemeral_attributes.delete_if { |_, v| v.empty? }
+      }.delete_if { |_, v| v.empty? }
+      ForemanLiudeskCMDB::SyncAssetJob.perform_later(
+        id,
+        **params
+      )
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .error("Failed to sync CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")
@@ -66,13 +72,9 @@ module Orchestration
 
     def cmdb_sync_asset_blocking
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .info("Syncing CMDB data for #{name}")
+                        .info("Syncing CMDB data (blocking) for #{name}")
 
-      res = ForemanLiudeskCMDB::SyncAsset::Organizer.call(host: self)
-      unless res.success?
-        ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                          .error("Failed to sync CMDB asset for #{name}. #{res.error}")
-      end
+      ForemanLiudeskCMDB::SyncAsset::Organizer.call!(host: self)
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .error("Failed to sync CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")
@@ -96,7 +98,7 @@ module Orchestration
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .info("Archiving CMDB asset for #{name}")
 
-      ForemanLiudeskCMDB::ArchiveAsset::Organizer.call(host: self)
+      ForemanLiudeskCMDB::ArchiveAsset::Organizer.call!(host: self)
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .error("Failed to archive CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")

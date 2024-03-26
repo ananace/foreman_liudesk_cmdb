@@ -12,7 +12,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::API.create_asset(:hardware_v1, **cmdb_params[:hardware])
+          context.hardware = ForemanLiudeskCMDB::API.create_asset(:hardware_v1, **params.merge(ephemeral_params))
         rescue LiudeskCMDB::UnprocessableError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .warn("#{self.class} error #{e}, attempting with only primary interface")
@@ -33,9 +33,22 @@ module ForemanLiudeskCMDB
           context.fail!(error: "#{self.class}: #{e}")
         end
 
-        private # rubocop:disable Lint/UselessAccessModifier
+        private
 
         delegate :cmdb_params, to: :context
+        delegate :host, to: :context
+
+        def facet
+          host.liudesk_cmdb_facet
+        end
+
+        def params
+          cmdb_params[:hardware]
+        end
+
+        def ephemeral_params
+          facet.ephemeral_attributes[:hardware]
+        end
       end
     end
   end

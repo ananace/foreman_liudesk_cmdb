@@ -41,7 +41,7 @@ module ForemanLiudeskCMDB
 
       params = asset_klass.convert_cmdb_to_ruby(raw_data[:asset] || {})
       params = params.slice(*host.liudesk_cmdb_facet.asset_parameter_keys) if sliced
-      params = params.compact if compacted
+      params = params.transform_values { |v| v == "" ? nil : v }.compact if compacted
 
       params
     end
@@ -59,7 +59,7 @@ module ForemanLiudeskCMDB
 
       params = asset_klass.convert_cmdb_to_ruby(raw_data[:hardware] || {})
       params = params.slice(*host.liudesk_cmdb_facet.hardware_parameter_keys) if sliced
-      params = params.compact if compacted
+      params = params.transform_values { |v| v == "" ? nil : v }.compact if compacted
 
       params
     end

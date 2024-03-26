@@ -11,7 +11,7 @@ module ForemanLiudeskCMDB
       end
 
       def call
-        context.asset = ForemanLiudeskCMDB::API.create_asset(facet.asset_model_type, **params)
+        context.asset = ForemanLiudeskCMDB::API.create_asset(facet.asset_model_type, **params.merge(ephemeral_params))
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
@@ -28,6 +28,10 @@ module ForemanLiudeskCMDB
 
       def params
         context.cmdb_params[:asset].merge(hardware_id: facet.hardware_id)
+      end
+
+      def ephemeral_params
+        facet.ephemeral_attributes[:asset]
       end
     end
   end

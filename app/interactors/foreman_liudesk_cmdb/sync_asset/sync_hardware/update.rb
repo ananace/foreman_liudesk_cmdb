@@ -16,7 +16,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          hardware_params.slice(*update_params).each do |key, value|
+          hardware_params.slice(*update_params).merge(ephemeral_params).each do |key, value|
             if hardware.retrieved?
               hardware.send(:"#{key}=", value) unless value_diff?(key, hardware.send(key), value)
             elsif value_diff?(key, cached_hardware_params[key], value)
@@ -48,6 +48,10 @@ module ForemanLiudeskCMDB
 
         def hardware_params
           cmdb_params[:hardware]
+        end
+
+        def ephemeral_params
+          context.host.liudesk_cmdb_facet.ephemeral_attributes[:hardware]
         end
 
         def value_diff?(key, current, wanted)

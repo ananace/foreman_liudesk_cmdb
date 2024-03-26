@@ -13,9 +13,9 @@ module ForemanLiudeskCMDB
 
     def call
       {
-        asset: asset_params,
+        asset: asset_params.merge(facet.ephemeral_attributes[:asset]),
         asset_type: host.liudesk_cmdb_facet.asset_model_type,
-        hardware: hardware_params,
+        hardware: hardware_params.merge(facet.ephemeral_attributes[:hardware]),
         hardware_type: host.liudesk_cmdb_facet.hardware_model_type
       }
     end
