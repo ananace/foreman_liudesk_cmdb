@@ -28,9 +28,9 @@ module ForemanLiudeskCMDB
 
     attr_reader :ephemeral_attributes
 
-    after_initialize { |_| clear_ephemeral! }
-
     def set_ephemeral(section, key, value)
+      clear_ephemeral! if @ephemeral_attributes.nil?
+
       raise ArgumentError, "Section must be one of #{ephemeral_attributes.keys.inspect}" \
         unless ephemeral_attributes.keys.include? section
 
@@ -38,6 +38,8 @@ module ForemanLiudeskCMDB
     end
 
     def ephemeral_attributes=(attrs)
+      clear_ephemeral! if @ephemeral_attributes.nil?
+
       attrs = attrs.slice(*ephemeral_attributes.keys).deep_symbolize_keys
       existing = (raw_data || { asset: {}, hardware: {} }).deep_symbolize_keys
 
@@ -50,6 +52,8 @@ module ForemanLiudeskCMDB
     end
 
     def ephemeral_attributes_any?
+      return false unless @ephemeral_attributes
+
       @ephemeral_attributes.any? { |_, v| v.any? }
     end
 
