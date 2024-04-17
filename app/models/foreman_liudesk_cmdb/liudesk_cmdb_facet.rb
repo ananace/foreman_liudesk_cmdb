@@ -22,6 +22,7 @@ module ForemanLiudeskCMDB
     validates :asset_type, presence: true
 
     before_save :cleanup_hardware_network_roles
+    after_initialize :clear_ephemeral!
 
     # Ephemeral attribute handling
     #
@@ -133,7 +134,7 @@ module ForemanLiudeskCMDB
     def asset_params_diff
       ForemanLiudeskCMDB::AssetParameterDifference
         .call(host)
-        .deep_merge(ephemeral_attributes)
+        .deep_merge(ephemeral_attributes || {})
         .delete_if { |_, v| v.empty? }
     end
 
@@ -161,7 +162,7 @@ module ForemanLiudeskCMDB
 
     def asset_will_change?(only: nil)
       return true if asset_type_changed?
-      return true if ephemeral_attributes.any? { |_, data| data.any? }
+      return true if ephemeral_attributes_any?
       return (asset_params_diff[only] || {}).any? if only
       return true if out_of_sync?
 
