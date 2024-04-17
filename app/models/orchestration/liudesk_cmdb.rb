@@ -57,8 +57,8 @@ module Orchestration
                         .info("Syncing CMDB data for #{name}")
 
       params = {
-        ephemeral_attributes: liudesk_cmdb_facet.ephemeral_attributes.delete_if { |_, v| v.empty? }
-      }.delete_if { |_, v| v.empty? }
+        ephemeral_attributes: liudesk_cmdb_facet.ephemeral_attributes&.delete_if { |_, v| v.empty? }
+      }.compact.delete_if { |_, v| v.empty? }
 
       ForemanLiudeskCMDB::SyncAssetJob.perform_later(
         id,
