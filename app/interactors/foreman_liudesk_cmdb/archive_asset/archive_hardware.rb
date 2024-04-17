@@ -8,6 +8,8 @@ module ForemanLiudeskCMDB
 
       around do |interactor|
         interactor.call if context.host.compute? && context.hardware
+      rescue LiudeskCMDB::NotFoundError
+        # Already removed, nothing to do
       end
 
       def call
