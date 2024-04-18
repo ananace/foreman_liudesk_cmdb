@@ -8,8 +8,6 @@ module ForemanLiudeskCMDB
 
       around do |interactor|
         interactor.call if context.host.compute? && context.hardware
-      rescue LiudeskCMDB::NotFoundError
-        # Already removed, nothing to do
       end
 
       def call
@@ -18,6 +16,8 @@ module ForemanLiudeskCMDB
         context.hardware.patch! if context.hardware.changed?
 
         context.hardware.delete!
+      rescue LiudeskCMDB::NotFoundError
+        # Already removed, nothing to do
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
