@@ -18,6 +18,10 @@ module ForemanLiudeskCMDB
         context.hardware.delete!
       rescue LiudeskCMDB::NotFoundError
         # Already removed, nothing to do
+      rescue LiudeskCMDB::UnprocessableError => e
+        ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
+                          .warn("#{self.class} (ignoring) error #{e}: #{e.backtrace}")
+        # Already removed, nothing to do
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")
