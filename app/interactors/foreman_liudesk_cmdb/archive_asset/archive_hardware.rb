@@ -12,15 +12,16 @@ module ForemanLiudeskCMDB
 
       def call
         # FIXME: This is temporary until deprecation supports MAC reuse
-        context.hardware.mac_and_network_access_roles = nil
-        context.hardware.patch! if context.hardware.changed?
+        begin
+          context.hardware.mac_and_network_access_roles = nil
+          context.hardware.patch! if context.hardware.changed?
+        rescue LiudeskCMDB::UnprocessableError => e
+          ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
+                            .warn("#{self.class} ignoring error on mac patch #{e}: #{e.backtrace}")
+        end
 
         context.hardware.delete!
       rescue LiudeskCMDB::NotFoundError
-        # Already removed, nothing to do
-      rescue LiudeskCMDB::UnprocessableError => e
-        ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                          .warn("#{self.class} (ignoring) error #{e}: #{e.backtrace}")
         # Already removed, nothing to do
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")

@@ -87,10 +87,15 @@ class ArchiveHardwareTest < ActiveSupport::TestCase
           status: 422,
           body: {}.to_json
         )
+        stub_delete = stub_request(:delete, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}").to_return(
+          status: 404,
+          body: {}.to_json
+        )
 
-        refute subject.success?
+        assert subject.success?
 
         assert_requested stub_patch
+        assert_requested stub_delete
       end
 
       context "when MAC address is assigned" do
