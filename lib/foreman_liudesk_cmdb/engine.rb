@@ -3,6 +3,13 @@
 require "interactor"
 require "liudesk_cmdb"
 
+# Preload CMDB models
+require "liudesk_cmdb/models/server"
+require "liudesk_cmdb/models/linux_client"
+require "liudesk_cmdb/models/linux_computerlab"
+require "liudesk_cmdb/models/windows_client"
+require "liudesk_cmdb/models/windows_computerlab"
+
 module ForemanLiudeskCMDB
   # Plugin engine
   class Engine < ::Rails::Engine
