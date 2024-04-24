@@ -76,6 +76,11 @@ module Orchestration
                         .info("Syncing CMDB data (blocking) for #{name}")
 
       ForemanLiudeskCMDB::SyncAsset::Organizer.call!(host: self)
+    rescue Interactor::Failure => wrapped
+      e = wrapped.context.error_obj
+      failure format(
+        _("Failed to sync %<name>s with CMDB: %<message>s\n "), name: name, message: e&.message || wrapped.context.error
+      ), e
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .error("Failed to sync CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")
@@ -100,6 +105,11 @@ module Orchestration
                         .info("Archiving CMDB asset for #{name}")
 
       ForemanLiudeskCMDB::ArchiveAsset::Organizer.call!(host: self)
+    rescue Interactor::Failure => wrapped
+      e = wrapped.context.error_obj
+      failure format(
+        _("Failed to sync %<name>s with CMDB: %<message>s\n "), name: name, message: e&.message || wrapped.context.error
+      ), e
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                         .error("Failed to archive CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")

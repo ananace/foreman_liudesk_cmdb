@@ -25,8 +25,8 @@ module ForemanLiudeskCMDB
         # Already removed, nothing to do
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                          .error("#{self.class} error #{e}: #{e.backtrace}")
-        context.fail!(error: "#{self.class}: #{e}")
+                          .error("#{self.class} error #{e.class}: #{e}")
+        context.fail!(error_obj: e, error: "#{self.class}: #{e}")
       end
     end
   end
