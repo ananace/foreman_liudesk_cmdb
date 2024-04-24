@@ -4,6 +4,7 @@ require "interactor"
 require "liudesk_cmdb"
 
 # Preload CMDB models
+require "liudesk_cmdb/models/hardware"
 require "liudesk_cmdb/models/server"
 require "liudesk_cmdb/models/linux_client"
 require "liudesk_cmdb/models/linux_computerlab"
