@@ -14,6 +14,7 @@ module ForemanLiudeskCMDB
 
       organize SyncAsset::SyncHardware::Organizer,
                SyncAsset::AttachThin,
+               SyncAsset::Attach,
                SyncAsset::Find,
                SyncAsset::RemoveOnTypeChange,
                SyncAsset::Update,

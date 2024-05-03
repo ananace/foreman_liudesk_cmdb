@@ -5,9 +5,6 @@ module ForemanLiudeskCMDB
     module SyncHardware
       # Attaches a thin hardware object to the context is one is available
       class AttachThin
-        # Skip attaching the thin object if cached data is older than 24h
-        FORCE_FULL_INTERVAL = 24 * 60 * 60
-
         include ::Interactor
 
         around do |interactor|
@@ -31,7 +28,7 @@ module ForemanLiudeskCMDB
         end
 
         def thin?
-          (Time.now - (facet.sync_at || Time.at(0))) < ForemanLiudeskCMDB::LiudeskCMDBFacet::FULL_RESYNC_INTERVAL
+          (Time.now - (facet.sync_at || Time.now)) < ForemanLiudeskCMDB::LiudeskCMDBFacet::FULL_RESYNC_INTERVAL
         end
       end
     end
