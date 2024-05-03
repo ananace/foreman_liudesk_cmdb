@@ -14,7 +14,7 @@ module ForemanLiudeskCMDB
         context.asset = ForemanLiudeskCMDB::API.get_asset asset_model_type, facet.asset_id
       rescue LiudeskCMDB::NotFoundError
         # Asset likely removed externally, mark for re-discovery/creation
-        facet.update asset_id: nil if facet.asset_id
+        facet.update asset_id: nil
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")

@@ -15,7 +15,7 @@ module ForemanLiudeskCMDB
           context.hardware = ForemanLiudeskCMDB::API.get_asset facet.hardware_model_type, facet.hardware_id
         rescue LiudeskCMDB::NotFoundError
           # Hardware likely removed externally, mark for re-discovery/creation
-          facet.update hardware_id: nil if facet.hardware_id
+          facet.update hardware_id: nil
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")

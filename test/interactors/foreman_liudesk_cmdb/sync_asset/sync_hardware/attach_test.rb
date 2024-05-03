@@ -2,9 +2,9 @@
 
 require "test_plugin_helper"
 
-class FindThinHardwareTest < ActiveSupport::TestCase
+class AttachHardwareTest < ActiveSupport::TestCase
   subject do
-    ForemanLiudeskCMDB::SyncAsset::SyncHardware::FindThin.call(
+    ForemanLiudeskCMDB::SyncAsset::SyncHardware::Attach.call(
       host: host
     )
   end
@@ -39,9 +39,28 @@ class FindThinHardwareTest < ActiveSupport::TestCase
 
   context "when hardware id is assigned in the facet" do
     let(:hardware_id) { "testdata" }
-    it "finds a thin hardware object" do
+    it "finds a full hardware object" do
+      stub_get = stub_request(:get, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Hardware/#{hardware_id}").to_return(
+        status: 200,
+        body: {
+          guid: "testdata",
+          make: "HP",
+          model: "ProLiant DL480 Gen8",
+          name: "HP Proliant DL480 Gen8-0001"
+        }.to_json
+      )
+
       assert subject.success?
       assert_equal "testdata", subject.hardware.identifier
+      assert_requested stub_get
+    end
+
+    it "handles non-existence correctly" do
+      host.liudesk_cmdb_facet.expects(:update).with(hardware_id: nil)
+      ForemanLiudeskCMDB::API.expects(:get_asset).raises(LiudeskCMDB::NotFoundError.new(nil, nil))
+
+      assert subject.success?
+      refute subject.hardware
     end
 
     it "handles errors correctly" do
