@@ -16,7 +16,8 @@ module ForemanLiudeskCMDB
           end
         end
 
-        organize SyncHardware::FindThin,
+        organize SyncHardware::AttachThin,
+                 SyncHardware::Attach,
                  SyncHardware::Find,
                  SyncHardware::Update,
                  SyncHardware::Create,
