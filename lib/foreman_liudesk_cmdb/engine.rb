@@ -104,7 +104,7 @@ module ForemanLiudeskCMDB
             :main_tabs,
             name: _("CMDB"),
             partial: "foreman_liudesk_cmdb/liudesk_cmdb_facet",
-            onlyif: proc { |host| host.liudesk_cmdb_facet }
+            onlyif: proc(&:liudesk_cmdb_facet)
           )
         end
       end
