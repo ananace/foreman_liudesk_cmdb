@@ -7,7 +7,7 @@ module ForemanLiudeskCMDB
       include ::Interactor
 
       around do |interactor|
-        interactor.call if facet.asset?
+        interactor.call if !context.asset && facet.asset?
       end
 
       def call
