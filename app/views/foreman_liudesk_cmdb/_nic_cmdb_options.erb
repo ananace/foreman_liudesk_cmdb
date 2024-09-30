@@ -3,7 +3,7 @@
 
   role_set = !item.network_access_role.nil? && !item.network_access_role.empty?
 -%>
-<%= select_f(f, :network_access_role, ForemanLiudeskCMDB::API.network_access_roles, :to_s, :to_s,
+<%= select_f(f, :network_access_role, ForemanLiudeskCMDB::API.network_access_roles(existing: item&.network_access_role), :to_s, :to_s,
       { include_blank: true,
         selected: item.network_access_role,
         disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
