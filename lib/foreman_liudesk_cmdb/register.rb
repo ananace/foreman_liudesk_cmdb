@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 Foreman::Plugin.register :foreman_liudesk_cmdb do
   requires_foreman ">= 3.12"
 
@@ -78,7 +79,8 @@ Foreman::Plugin.register :foreman_liudesk_cmdb do
       :main_tabs,
       name: _("CMDB"),
       partial: "foreman_liudesk_cmdb/liudesk_cmdb_facet",
-      onlyif: proc { |h| h.liudesk_cmdb_facet }
+      onlyif: proc { |h| h.liudesk_cmdb_facet } # rubocop:disable Style/SymbolProc - Does not work with caller
     )
   end
 end
+# rubocop:enable Metrics/BlockLength

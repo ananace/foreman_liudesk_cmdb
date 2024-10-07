@@ -26,7 +26,7 @@ module ForemanLiudeskCMDB
 
     initializer "foreman_liudesk_cmdb.register_plugin", before: :finisher_hook do |app|
       app.reloader.to_prepare do
-        require_relative 'register'
+        require_relative "register"
       end
     end
 
