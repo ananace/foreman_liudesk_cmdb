@@ -35,7 +35,10 @@ module ForemanLiudeskCMDB
         rescue StandardError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .error("#{self.class} error #{e}: #{e.backtrace}")
-          context.fail!(error_obj: e, error: "#{self.class}: #{e}")
+
+          context.error_obj = e
+          context.error = "#{self.class}: #{e}"
+          context.fail! unless e.to_s =~ /mac is already assigned/i
         end
 
         private
