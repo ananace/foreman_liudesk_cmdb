@@ -109,7 +109,11 @@ module ForemanLiudeskCMDB
 
     def find_hardware_mac_and_network_access_roles
       roles = {}
-      host.interfaces.select { |iface| iface&.mac }.compact.each do |iface|
+      # Filter out MAC-less and WiFi interfaces from assigning hardware roles
+      host.interfaces
+          .compact
+          .select { |iface| iface.mac && iface.name !~ /^(wlan\d+|wl([osp]\d+)+|wlx[0-9a-fA-F]{12,})$/ }
+          .each do |iface|
         roles[iface.mac.upcase] ||= iface.deep_network_access_role
       end
 
