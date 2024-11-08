@@ -2,8 +2,10 @@
   subject ||= @host
   obj = subject.liudesk_cmdb_facet
 
-  asset_data = OpenStruct.new((obj.raw_data || {}).with_indifferent_access[:asset] || {})
-  hardware_data = OpenStruct.new((obj.raw_data || {}).with_indifferent_access[:hardware] || {})
+  existing_asset_data = obj.ephemeral_attributes[:asset] || {}
+  asset_data = OpenStruct.new(((obj.raw_data || {}).with_indifferent_access[:asset] || {}).merge(existing_asset_data))
+  existing_hardware_data = obj.ephemeral_attributes[:hardware] || {}
+  hardware_data = OpenStruct.new(((obj.raw_data || {}).with_indifferent_access[:hardware] || {}).merge(existing_hardware_data))
 -%>
 <%= fields_for subject do |f| %>
   <%= f.fields_for 'liudesk_cmdb_facet_attributes' do |f| %>
@@ -12,10 +14,10 @@
         <h2 class="ca">Asset information</h2>
       </div>
       <%= f.fields_for 'asset', asset_data do |f| %>
-        <%= disabled_text_f(f, :asset_owner, size: 'col-md-8', label: _("Owner")) %>
+        <%= cmdb_text_f(f, :asset_owner, size: 'col-md-8', label: _("Owner"), disabled: !existing_asset_data[:asset_owner]&.present?, error: obj.errors['ephemeral_attributes.asset.asset_owner']) %>
         <%- unless obj.client? %>
-          <%= disabled_text_f(f, :contact_information, size: 'col-md-8', label: _("Contact information")) %>
-          <%= disabled_textarea_f(f, :misc_information, help_block: _("Additional information about this asset"), size: 'col-md-8', rows: '3', class: 'no-stretch', label: _("Misc Information")) %>
+          <%= cmdb_text_f(f, :contact_information, size: 'col-md-8', label: _("Contact information"), disabled: !existing_asset_data[:contact_information]&.present?) %>
+          <%= cmdb_textarea_f(f, :misc_information, help_block: _("Additional information about this asset"), size: 'col-md-8', rows: '3', class: 'no-stretch', label: _("Misc Information"), disabled: !existing_asset_data[:misc_information]&.present?) %>
         <%- end %>
       <%- end %>
 
@@ -23,9 +25,9 @@
         <h2 class="ca">Hardware information</h2>
       </div>
       <%= f.fields_for 'hardware', hardware_data do |f| %>
-        <%= disabled_text_f(f, :asset_owner, size: 'col-md-8', label: _("Owner")) %>
-        <%= disabled_text_f(f, :contact_information, size: 'col-md-8', label: _("Contact information")) %>
-        <%= disabled_textarea_f(f, :misc_information, help_block: _("Additional information about this hardware"), size: 'col-md-8', rows: '3', class: 'no-stretch', label: _("Misc Information")) %>
+        <%= cmdb_text_f(f, :asset_owner, size: 'col-md-8', label: _("Owner"), disabled: !existing_hardware_data[:asset_owner]&.present?, error: obj.errors['ephemeral_attributes.hardware.asset_owner']) %>
+        <%= cmdb_text_f(f, :contact_information, size: 'col-md-8', label: _("Contact information"), disabled: !existing_hardware_data[:contact_information]&.present?) %>
+        <%= cmdb_textarea_f(f, :misc_information, help_block: _("Additional information about this hardware"), size: 'col-md-8', rows: '3', class: 'no-stretch', label: _("Misc Information"), disabled: !existing_hardware_data[:misc_information]&.present?) %>
       <%- end %>
     <%- end %>
   <%- end %>

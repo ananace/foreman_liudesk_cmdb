@@ -233,12 +233,12 @@ module ForemanLiudeskCMDB
 
     def validate_ephemeral_asset_attributes
       attrs = @ephemeral_attributes[:asset]
-      errors.add('ephemeral_attributes.asset.asset_owner', "Owner must be a LiU ID") if attrs[:asset_owner]&.present? && attrs[:asset_owner] !~ LIUID_REX
+      errors.add('ephemeral_attributes.asset.asset_owner', "must be a valid LiU ID") if attrs[:asset_owner]&.present? && attrs[:asset_owner] !~ LIUID_REX
     end
 
     def validate_ephemeral_hardware_attributes
       attrs = @ephemeral_attributes[:hardware]
-      errors.add('ephemeral_attributes.hardware.asset_owner', "Owner must be a LiU ID") if attrs[:asset_owner]&.present? && attrs[:asset_owner] !~ LIUID_REX
+      errors.add('ephemeral_attributes.hardware.asset_owner', "must be a valid LiU ID") if attrs[:asset_owner]&.present? && attrs[:asset_owner] !~ LIUID_REX
     end
   end
 end

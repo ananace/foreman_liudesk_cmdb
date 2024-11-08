@@ -2,8 +2,8 @@
 
 # Helpers for rendering overridable CMDB data
 module CmdbHelper
-  def disabled_text_f(f, attr, **options)
-    options.merge! disabled: true
+  def cmdb_text_f(f, attr, **options)
+    options[:disabled] = true unless options.key? :disabled
     field f, attr, options do
       addClass options, "form-control"
 
@@ -20,8 +20,8 @@ module CmdbHelper
     end
   end
 
-  def disabled_textarea_f(f, attr, **options)
-    options.merge! disabled: true
+  def cmdb_textarea_f(f, attr, **options)
+    options[:disabled] = true unless options.key? :disabled
     field f, attr, options do
       addClass options, "form-control"
 
