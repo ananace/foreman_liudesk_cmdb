@@ -2,8 +2,13 @@
 
 # Helpers for rendering overridable CMDB data
 module CmdbHelper
-  def cmdb_text_f(f, attr, **options)
-    options[:disabled] = true unless options.key? :disabled
+  def cmdb_text_f(f, facet, ephemeral_attr, **options)
+    unless options.key? :disabled
+      options[:disabled] = !facet.ephemeral_attributes.dig(*ephemeral_attr.split('.').map(&:to_sym))&.present?
+    end
+    options[:error] = facet.errors["ephemeral_attributes.#{ephemeral_attr}"]
+
+    attr = ephemeral_attr.split('.').last.to_sym
     field f, attr, options do
       addClass options, "form-control"
 
@@ -20,8 +25,13 @@ module CmdbHelper
     end
   end
 
-  def cmdb_textarea_f(f, attr, **options)
-    options[:disabled] = true unless options.key? :disabled
+  def cmdb_textarea_f(f, facet, ephemeral_attr, **options)
+    unless options.key? :disabled
+      options[:disabled] = !facet.ephemeral_attributes.dig(*ephemeral_attr.split('.').map(&:to_sym))&.present?
+    end
+    options[:error] = facet.errors["ephemeral_attributes.#{ephemeral_attr}"]
+
+    attr = ephemeral_attr.split('.').last.to_sym
     field f, attr, options do
       addClass options, "form-control"
 
