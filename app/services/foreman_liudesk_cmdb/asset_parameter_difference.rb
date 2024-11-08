@@ -70,7 +70,7 @@ module ForemanLiudeskCMDB
         existing = @cached.dig(:hardware, :mac_and_network_access_roles)&.find { |r| r[:mac].downcase == role[:mac].downcase }
         next unless existing
 
-        existing[:networkAccessRole] == existing[:networkAccessRole]
+        existing[:networkAccessRole] == role[:networkAccessRole]
       end
       data.delete :mac_and_network_access_roles if data[:mac_and_network_access_roles]&.empty?
     end
