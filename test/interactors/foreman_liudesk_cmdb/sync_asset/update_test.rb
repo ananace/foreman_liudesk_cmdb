@@ -120,6 +120,32 @@ class UpdateAssetTest < ActiveSupport::TestCase
       assert_requested(stub_patch)
     end
 
+    it "updates ephemeral data correctly" do
+      host.liudesk_cmdb_facet.set_ephemeral :asset, :asset_owner, 'valid123'
+
+      updated = {
+        assetOwner: 'valid123',
+        hostName: hostname,
+        operatingSystemType: "Debian",
+        operatingSystem: "Debian 10.0",
+        operatingSystemInstallDate: "2021-12-31T23:00:00.000Z",
+        managementSystem: "ITI-Foreman",
+        managementSystemId: "#{SETTINGS[:fqdn]}/1",
+        foremanLink: "https://#{SETTINGS[:fqdn]}/hosts/#{hostname}"
+      }
+      stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{asset.api_url}").with(
+        body: updated
+      ).to_return(
+        status: 200,
+        body: updated.merge(
+          hardwareID: hardware_id
+        ).to_json
+      )
+
+      assert subject.success?
+      assert_requested(stub_patch)
+    end
+
     it "handles errors correctly" do
       stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/#{asset.api_url}").to_return(
         status: 400,
