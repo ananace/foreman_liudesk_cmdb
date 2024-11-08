@@ -12,6 +12,7 @@
         <h2 class="ca">Asset information</h2>
       </div>
       <%= f.fields_for 'asset', asset_data do |f| %>
+        <%= disabled_text_f(f, :asset_owner, size: 'col-md-8', label: _("Owner")) %>
         <%- unless obj.client? %>
           <%= disabled_text_f(f, :contact_information, size: 'col-md-8', label: _("Contact information")) %>
           <%= disabled_textarea_f(f, :misc_information, help_block: _("Additional information about this asset"), size: 'col-md-8', rows: '3', class: 'no-stretch', label: _("Misc Information")) %>
@@ -22,6 +23,7 @@
         <h2 class="ca">Hardware information</h2>
       </div>
       <%= f.fields_for 'hardware', hardware_data do |f| %>
+        <%= disabled_text_f(f, :asset_owner, size: 'col-md-8', label: _("Owner")) %>
         <%= disabled_text_f(f, :contact_information, size: 'col-md-8', label: _("Contact information")) %>
         <%= disabled_textarea_f(f, :misc_information, help_block: _("Additional information about this hardware"), size: 'col-md-8', rows: '3', class: 'no-stretch', label: _("Misc Information")) %>
       <%- end %>

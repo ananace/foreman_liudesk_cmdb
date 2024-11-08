@@ -213,7 +213,7 @@ module Host
         )
 
         assert_equal(
-          { asset: { operating_system_type: "RedHat", operating_system: "RedHat 8.8", misc_information: "Testing" }, hardware: { mac_and_network_access_roles: [] } },
+          { asset: { operating_system_type: "RedHat", operating_system: "RedHat 8.8", misc_information: "Testing" } },
           host.liudesk_cmdb_facet.asset_params_diff
         )
         assert host.liudesk_cmdb_facet.asset_will_change?

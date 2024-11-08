@@ -70,5 +70,33 @@ module Host
         assert host.liudesk_cmdb_facet.asset_will_change?
       end
     end
+
+    context "when considering validation" do
+      it "will validate ephemeral asset attributes" do
+        assert host.liudesk_cmdb_facet.valid?
+
+        host.liudesk_cmdb_facet.set_ephemeral :asset, :asset_owner, 'invalid'
+        refute host.liudesk_cmdb_facet.valid?
+
+        host.liudesk_cmdb_facet.set_ephemeral :asset, :asset_owner, 'valid123'
+        assert host.liudesk_cmdb_facet.valid?
+
+        host.liudesk_cmdb_facet.set_ephemeral :asset, :asset_owner, ''
+        assert host.liudesk_cmdb_facet.valid?
+      end
+
+      it "will validate ephemeral hardware attributes" do
+        assert host.liudesk_cmdb_facet.valid?
+
+        host.liudesk_cmdb_facet.set_ephemeral :hardware, :asset_owner, 'invalid'
+        refute host.liudesk_cmdb_facet.valid?
+
+        host.liudesk_cmdb_facet.set_ephemeral :hardware, :asset_owner, 'valid123'
+        assert host.liudesk_cmdb_facet.valid?
+
+        host.liudesk_cmdb_facet.set_ephemeral :hardware, :asset_owner, ''
+        assert host.liudesk_cmdb_facet.valid?
+      end
+    end
   end
 end

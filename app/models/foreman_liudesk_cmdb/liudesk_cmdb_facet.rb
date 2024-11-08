@@ -21,6 +21,8 @@ module ForemanLiudeskCMDB
     validates :host, presence: true, allow_blank: false
     validates :asset_type, presence: true
 
+    validate :validate_ephemeral_attributes
+
     before_save :cleanup_hardware_network_roles
     after_initialize :clear_ephemeral!
 
@@ -205,12 +207,38 @@ module ForemanLiudeskCMDB
       (facet_attributes || {}).merge(super) { |_, left, right| left || right }
     end
 
+    def read_attribute_for_validation(key)
+      return super unless key.to_s.include?('.')
+
+      path = key.to_s.split('.').map(&:to_sym)
+      public_send(path.first).dig(*path[1..])
+    end
+
     private
+
+    LIUID_REX = /^[a-z]{1,5}\d{2,3}$/
 
     def cleanup_hardware_network_roles
       hardware_network_roles&.delete_if do |_mac, entry|
         !entry.key?("role") || entry["role"].nil? || entry["role"].empty?
       end
+    end
+
+    def validate_ephemeral_attributes
+      return unless ephemeral_attributes_any?
+
+      validate_ephemeral_asset_attributes if @ephemeral_attributes[:asset]&.any?
+      validate_ephemeral_hardware_attributes if @ephemeral_attributes[:hardware]&.any?
+    end
+
+    def validate_ephemeral_asset_attributes
+      attrs = @ephemeral_attributes[:asset]
+      errors.add('ephemeral_attributes.asset.asset_owner', "Owner must be a LiU ID") if attrs[:asset_owner]&.present? && attrs[:asset_owner] !~ LIUID_REX
+    end
+
+    def validate_ephemeral_hardware_attributes
+      attrs = @ephemeral_attributes[:hardware]
+      errors.add('ephemeral_attributes.hardware.asset_owner', "Owner must be a LiU ID") if attrs[:asset_owner]&.present? && attrs[:asset_owner] !~ LIUID_REX
     end
   end
 end
