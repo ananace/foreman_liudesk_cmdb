@@ -112,7 +112,7 @@ module ForemanLiudeskCMDB
       # Filter out MAC-less and WiFi interfaces from assigning hardware roles
       host.interfaces
           .compact
-          .select { |iface| iface.mac && iface.identifier !~ /^(wlan\d+|wl([osp]\d+)+|wlx[0-9a-f]{12,})$/i }
+          .select { |iface| filter_iface(iface) }
           .each do |iface|
         roles[iface.mac.upcase] ||= iface.deep_network_access_role
       end
@@ -125,6 +125,14 @@ module ForemanLiudeskCMDB
           }.compact
         end
       }
+    end
+
+    def filter_iface(iface)
+      return unless iface.mac
+      return unless iface.mac =~ /^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i # Only handle ethernet NICs, not IB/FC
+      return if iface.identifier =~ /^(wlan\d+|wl([osp]\d+)+|wlx[0-9a-f]{12,})$/i # Skip wifi interfaces
+
+      true
     end
   end
 end
