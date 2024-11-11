@@ -13,7 +13,7 @@ module ForemanLiudeskCMDB
       def call
         # Rename before deprecation to avoid collision
         # FIXME: This is temporary until deprecation supports name reuse
-        context.asset.identifier += "-depr-#{Time.now.to_i}"
+        context.asset.identifier = "d-#{Time.now.to_i.to_s(36)}-#{context.asset.identifier}"
         context.asset.patch!
 
         context.asset.delete!
