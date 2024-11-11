@@ -61,7 +61,7 @@ class RemoveOnTypeChangeAssetTest < ActiveSupport::TestCase
         Time.stubs(:now).returns(Time.new(2020, 1, 1))
         stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Clients/linux/#{hostname}").with( # rubocop:disable Layout/LineLength
           body: {
-            hostName: "#{hostname}-chng-#{Time.now.to_i}"
+            hostName: "c-#{Time.now.to_i.to_s(36)}-#{hostname}"
           }
         ).to_return(
           status: 201,

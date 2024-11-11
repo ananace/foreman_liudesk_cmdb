@@ -86,7 +86,7 @@ module Host
         Time.stubs(:now).returns(Time.new(2020, 1, 1))
         stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server/#{host.fqdn}").with(
           body: {
-            hostName: "#{host.fqdn}-depr-#{Time.now.to_i}"
+            hostName: "d-#{Time.now.to_i.to_s(36)}-#{host.fqdn}"
           }
         ).to_return(
           status: 400,

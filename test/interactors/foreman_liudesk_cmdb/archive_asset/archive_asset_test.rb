@@ -49,7 +49,7 @@ class ArchiveAssetTest < ActiveSupport::TestCase
       Time.stubs(:now).returns(Time.new(2020, 1, 1))
       stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server/#{asset_id}").with(
         body: {
-          hostName: "#{hostname}-depr-#{Time.now.to_i}"
+          hostName: "d-#{Time.now.to_i.to_s(36)}-#{hostname}"
         }
       ).to_return(
         status: 201,
@@ -70,7 +70,7 @@ class ArchiveAssetTest < ActiveSupport::TestCase
       Time.stubs(:now).returns(Time.new(2020, 1, 1))
       stub_patch = stub_request(:patch, "#{Setting[:liudesk_cmdb_url]}/liudesk-cmdb/api/Server/#{asset_id}").with(
         body: {
-          hostName: "#{hostname}-depr-#{Time.now.to_i}"
+          hostName: "d-#{Time.now.to_i.to_s(36)}-#{hostname}"
         }
       ).to_return(
         status: 400,
