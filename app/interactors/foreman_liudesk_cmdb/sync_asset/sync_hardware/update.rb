@@ -12,7 +12,7 @@ module ForemanLiudeskCMDB
         end
 
         def update_params
-          %i[serial_number bios_uuid mac_and_network_access_roles]
+          %i[make model serial_number bios_uuid mac_and_network_access_roles]
         end
 
         def call
