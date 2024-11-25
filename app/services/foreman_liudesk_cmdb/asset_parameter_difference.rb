@@ -49,7 +49,11 @@ module ForemanLiudeskCMDB
     def cleanup_asset(data)
       # Avoid pushing impossible role changes
       data.delete :network_access_role unless @active.dig(:asset, :certificate_information)
-      # data.delete :network_access_role if data[:network_access_role]
+      # Ignore change between nil<=>"None", they're the same on the CMDB side
+      if (data[:network_access_role].nil? && @cached.dig(:asset, :network_access_role) == "None") ||
+         (data[:network_access_role] == "None" && @cached.dig(:asset, :network_access_role).nil?)
+        data.delete :network_access_role
+      end
 
       # Ignore case difference on OS type, LiUDesk likes to capitalize the input data
       case_issues = %i[operating_system_type]
