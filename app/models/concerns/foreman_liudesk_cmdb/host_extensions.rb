@@ -29,5 +29,9 @@ module ForemanLiudeskCMDB
 
       f
     end
+
+    def refresh_cmdb_status
+      refresh_statuses([HostStatus::CMDBStatus])
+    end
   end
 end

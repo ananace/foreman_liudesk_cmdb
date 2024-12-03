@@ -86,6 +86,8 @@ module Orchestration
                         .error("Failed to sync CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")
 
       failure format(_("Failed to sync %<name>s with CMDB: %<message>s\n "), name: name, message: e.message), e
+    ensure
+      refresh_cmdb_status
     end
 
     def cmdb_archive_asset
@@ -115,6 +117,8 @@ module Orchestration
                         .error("Failed to archive CMDB asset for #{name}. #{e.class}: #{e} - #{e.backtrace}")
 
       failure format(_("Failed to archive %<name>s on CMDB: %<message>s\n "), name: name, message: e.message), e
+    ensure
+      refresh_cmdb_status
     end
   end
 end
