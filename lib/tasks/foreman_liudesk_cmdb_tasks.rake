@@ -4,8 +4,8 @@ require "rake/testtask"
 
 namespace :foreman_liudesk_cmdb do
   namespace :sync do
-    desc "Example Task"
-    task full: :environment do
+    desc "Force-sync CMDB data for all hosts"
+    task all_hosts: :environment do
       User.as_anonymous_admin do
         Host::Managed.where(managed: true).each do |host|
           unless host.liudesk_cmdb_facet.asset_params_diff.empty?
@@ -22,6 +22,15 @@ namespace :foreman_liudesk_cmdb do
             puts "Failed to push #{host.name}: #{result.error}"
           end
         end
+      end
+    end
+
+    desc "Update CMDB sync statuses for all hosts"
+    task statuses: :environment do
+      User.as_anonymous_admin do
+        ids = Host::Managed.where(managed: true).select(&:liudesk_cmdb_facet).map(&:id)
+
+        ForemanLiudeskCMDB::RefreshCMDBStatusJob.perform_later(ids)
       end
     end
   end
