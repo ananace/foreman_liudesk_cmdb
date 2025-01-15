@@ -40,6 +40,15 @@ module ForemanLiudeskCMDB
         %w[None] + [existing].compact
       end
 
+      def divisions(existing: nil)
+        Rails.cache.fetch("#{cache_key}/divisions", expires_in: 8.hours) do
+          JSON.parse(client.get("liudesk-cmdb/api/divisions", :v1)).sort
+        end
+      rescue StandardError => e
+        Rails.logger.warn "Failed to retrieve CMDB divisions, using fallback. #{e.class}: #{e}"
+        [existing].compact
+      end
+
       private
 
       def cache_key
