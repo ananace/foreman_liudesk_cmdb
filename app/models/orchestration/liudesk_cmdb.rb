@@ -121,8 +121,6 @@ module Orchestration
                         .error("Failed to archive CMDB asset for #{name}.", e)
 
       failure format(_("Failed to archive %<name>s on CMDB: %<message>s\n "), name: name, message: e.message), e
-    ensure
-      refresh_cmdb_status
     end
   end
 end
