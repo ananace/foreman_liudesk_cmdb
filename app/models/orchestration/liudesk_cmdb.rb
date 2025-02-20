@@ -78,14 +78,12 @@ module Orchestration
       ForemanLiudeskCMDB::SyncAsset::Organizer.call!(host: self)
     rescue Interactor::Failure => wrapped
       e = wrapped.context.error_obj
-      ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .exception("Failed to sync CMDB asset for #{name}.", e)
+      ::Foreman::Logging.exception("Failed to sync CMDB asset for #{name}.", e)
       failure format(
         _("Failed to sync %<name>s with CMDB: %<message>s\n "), name: name, message: e&.message || wrapped.context.error
       ), e
     rescue StandardError => e
-      ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .exception("Failed to sync CMDB asset for #{name}.", e)
+      ::Foreman::Logging.exception("Failed to sync CMDB asset for #{name}.", e)
 
       failure format(_("Failed to sync %<name>s with CMDB: %<message>s\n "), name: name, message: e.message), e
     ensure
@@ -98,8 +96,7 @@ module Orchestration
 
       ForemanLiudeskCMDB::ArchiveAssetJob.perform_later(id)
     rescue StandardError => e
-      ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .exception("Failed to archive CMDB asset for #{name}.", e)
+      ::Foreman::Logging.exception("Failed to archive CMDB asset for #{name}.", e)
 
       failure format(_("Failed to archive %<name>s on CMDB: %<message>s\n "), name: name, message: e.message), e
     end
@@ -111,14 +108,12 @@ module Orchestration
       ForemanLiudeskCMDB::ArchiveAsset::Organizer.call!(host: self)
     rescue Interactor::Failure => wrapped
       e = wrapped.context.error_obj
-      ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .exception("Failed to archive CMDB asset for #{name}.", e)
+      ::Foreman::Logging.exception("Failed to archive CMDB asset for #{name}.", e)
       failure format(
         _("Failed to sync %<name>s with CMDB: %<message>s\n "), name: name, message: e&.message || wrapped.context.error
       ), e
     rescue StandardError => e
-      ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .exception("Failed to archive CMDB asset for #{name}.", e)
+      ::Foreman::Logging.exception("Failed to archive CMDB asset for #{name}.", e)
 
       failure format(_("Failed to archive %<name>s on CMDB: %<message>s\n "), name: name, message: e.message), e
     end
