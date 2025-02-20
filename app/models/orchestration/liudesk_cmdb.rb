@@ -112,13 +112,13 @@ module Orchestration
     rescue Interactor::Failure => wrapped
       e = wrapped.context.error_obj
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .error("Failed to archive CMDB asset for #{name}.", e)
+                        .exception("Failed to archive CMDB asset for #{name}.", e)
       failure format(
         _("Failed to sync %<name>s with CMDB: %<message>s\n "), name: name, message: e&.message || wrapped.context.error
       ), e
     rescue StandardError => e
       ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
-                        .error("Failed to archive CMDB asset for #{name}.", e)
+                        .exception("Failed to archive CMDB asset for #{name}.", e)
 
       failure format(_("Failed to archive %<name>s on CMDB: %<message>s\n "), name: name, message: e.message), e
     end
