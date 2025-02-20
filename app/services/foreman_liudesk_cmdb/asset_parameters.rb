@@ -105,7 +105,7 @@ module ForemanLiudeskCMDB
 
     def find_hardware_serial_number
       sn = host.facts["dmi::product::serial_number"] || host.facts["serialnumber"]
-      sn = nil if serial_number && serial_number =~ / (?:O\.E\.M\.|Serial)/
+      sn = nil if sn && sn =~ / (?:O\.E\.M\.|Serial)/
       { serial_number: sn }.compact
     end
 
