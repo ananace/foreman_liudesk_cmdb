@@ -125,6 +125,8 @@ class UpdateHardwareTest < ActiveSupport::TestCase
 
     it "updates hardware" do
       updated = {
+        make: "HP",
+        model: "ProLiant DL480 Gen8",
         serialNumber: "abc123",
         biosUuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8",
         macAndNetworkAccessRoles: [
@@ -156,6 +158,8 @@ class UpdateHardwareTest < ActiveSupport::TestCase
       host.liudesk_cmdb_facet.set_ephemeral :hardware, :asset_owner, 'valid123'
 
       updated = {
+        make: "HP",
+        model: "ProLiant DL480 Gen8",
         assetOwner: 'valid123',
         serialNumber: "abc123",
         biosUuid: "515bd9a2-d42a-4d4a-b57d-6ce464b549b8",
