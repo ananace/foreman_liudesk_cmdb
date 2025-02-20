@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Helpers for rendering overridable CMDB data
-module CmdbHelper
+module CMDBHelper
   def cmdb_text_f(f, facet, ephemeral_attr, **options)
     unless options.key? :disabled
       options[:disabled] = !facet.ephemeral_attributes.dig(*ephemeral_attr.split(".").map(&:to_sym))&.present?
