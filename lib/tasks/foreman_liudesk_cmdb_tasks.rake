@@ -7,8 +7,9 @@ namespace :foreman_liudesk_cmdb do
     desc "Force-sync CMDB data for all hosts"
     task all_hosts: :environment do
       User.as_anonymous_admin do
-        Host::Managed.where(managed: true).each do |host|
-          unless host.liudesk_cmdb_facet.asset_params_diff.empty?
+        ForemanLiudeskCMDB::LiudeskCMDBFacet.each do |facet|
+          host = facet.host
+          unless facet.asset_params_diff.empty?
             puts "Nothing to push for #{host.name}"
             next
           end
@@ -19,7 +20,26 @@ namespace :foreman_liudesk_cmdb do
           if result.success?
             puts "#{host.name} pushed"
           else
-            puts "Failed to push #{host.name}: #{result.error}"
+            puts "Failed to push #{host.name}:\n  #{result.error}"
+          end
+        end
+      end
+    end
+
+    desc "Sync CMDB data for hosts that are potentially out-of-date"
+    task out_of_date: :environment do
+      User.as_anonymous_admin do
+        ForemanLiudeskCMDB::LiudeskCMDBFacet.each do |facet|
+          next unless facet.out_of_date?
+
+          host = facet.host
+          puts "Pushing #{host.name} to LiudeskCMDB"
+          result = ForemanLiudeskCMDB::SyncAsset::Organizer.call(host: host)
+
+          if result.success?
+            puts "#{host.name} pushed"
+          else
+            puts "Failed to push #{host.name}:\n  #{result.error}"
           end
         end
       end
@@ -28,7 +48,7 @@ namespace :foreman_liudesk_cmdb do
     desc "Update CMDB sync statuses for all hosts"
     task statuses: :environment do
       User.as_anonymous_admin do
-        ids = Host::Managed.where(managed: true).select(&:liudesk_cmdb_facet).map(&:id)
+        ids = ForemanLiudeskCMDB::LiudeskCMDBFacet.all.map { |facet| facet.host.id }
 
         ForemanLiudeskCMDB::RefreshCMDBStatusJob.perform_later(ids)
       end
