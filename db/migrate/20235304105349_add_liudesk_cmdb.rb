@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Main database migration
-class AddLiudeskCmdb < ActiveRecord::Migration[6.1]
+class AddLiudeskCMDB < ActiveRecord::Migration[6.1]
   def change
     create_table :liudesk_cmdb_facets do |t|
       t.integer :host_id, null: false, index: true
