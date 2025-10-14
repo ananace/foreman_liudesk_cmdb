@@ -67,7 +67,7 @@ class UpdateAssetTest < ActiveSupport::TestCase
   end
   let(:asset) do
     LiudeskCMDB::Models::ServerV1.new(
-      ForemanLiudeskCMDB::API.client,
+      ForemanLiudeskCMDB::Api.client,
       asset_id
     )
   end
@@ -161,7 +161,7 @@ class UpdateAssetTest < ActiveSupport::TestCase
     let(:asset_type) { "client" }
     let(:asset) do
       LiudeskCMDB::Models::LinuxClientV1.new(
-        ForemanLiudeskCMDB::API.client,
+        ForemanLiudeskCMDB::Api.client,
         asset_id
       )
     end

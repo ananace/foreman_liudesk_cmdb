@@ -58,7 +58,7 @@ class FindAssetTest < ActiveSupport::TestCase
     end
 
     it "handles failures correctly" do
-      ForemanLiudeskCMDB::API.expects(:get_asset).raises(StandardError)
+      ForemanLiudeskCMDB::Api.expects(:get_asset).raises(StandardError)
 
       refute subject.success?
       refute subject.asset

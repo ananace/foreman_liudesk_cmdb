@@ -11,7 +11,7 @@ module ForemanLiudeskCMDB
       end
 
       def call
-        context.asset = ForemanLiudeskCMDB::API.get_asset(asset_model_type, host.fqdn)
+        context.asset = ForemanLiudeskCMDB::Api.get_asset(asset_model_type, host.fqdn)
       rescue LiudeskCMDB::NotFoundError
         # Asset not found, continue
       rescue StandardError => e

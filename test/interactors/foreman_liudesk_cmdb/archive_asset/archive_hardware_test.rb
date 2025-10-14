@@ -17,7 +17,7 @@ class ArchiveHardwareTest < ActiveSupport::TestCase
   let(:hardware_id) { "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0" }
   let(:hardware) do
     LiudeskCMDB::Models::HardwareV1.new(
-      ForemanLiudeskCMDB::API.client,
+      ForemanLiudeskCMDB::Api.client,
       hardware_id
     )
   end
@@ -101,7 +101,7 @@ class ArchiveHardwareTest < ActiveSupport::TestCase
       context "when MAC address is assigned" do
         let(:hardware) do
           LiudeskCMDB::Models::HardwareV1.new(
-            ForemanLiudeskCMDB::API.client,
+            ForemanLiudeskCMDB::Api.client,
             hardware_id,
             mac_and_network_access_roles: [
               { mac: "01:02:03:04:05:06", networkAccessRole: "None" }

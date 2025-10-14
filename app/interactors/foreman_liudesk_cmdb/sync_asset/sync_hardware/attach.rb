@@ -12,7 +12,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::API.get_asset facet.hardware_model_type, facet.hardware_id
+          context.hardware = ForemanLiudeskCMDB::Api.get_asset facet.hardware_model_type, facet.hardware_id
         rescue LiudeskCMDB::NotFoundError
           # Hardware likely removed externally, mark for re-discovery/creation
           facet.update hardware_id: nil

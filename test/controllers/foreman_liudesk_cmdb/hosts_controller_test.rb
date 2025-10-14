@@ -22,7 +22,7 @@ module ForemanLiudeskCMDB
 
     describe "#edit" do
       setup do
-        ForemanLiudeskCMDB::API.stubs(:network_access_roles).returns(%w[None Guest])
+        ForemanLiudeskCMDB::Api.stubs(:network_access_roles).returns(%w[None Guest])
       end
 
       test "Host with CMDB facet should show misc edit fields" do

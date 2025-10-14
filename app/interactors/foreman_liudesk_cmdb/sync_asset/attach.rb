@@ -11,7 +11,7 @@ module ForemanLiudeskCMDB
       end
 
       def call
-        context.asset = ForemanLiudeskCMDB::API.get_asset asset_model_type, facet.asset_id
+        context.asset = ForemanLiudeskCMDB::Api.get_asset asset_model_type, facet.asset_id
       rescue LiudeskCMDB::NotFoundError
         # Asset likely removed externally, mark for re-discovery/creation
         facet.update asset_id: nil

@@ -9,13 +9,13 @@ class CMDBAPITest < ActiveSupport::TestCase
 
   context "when reading network roles" do
     it "generates a valid cache key" do
-      key = ForemanLiudeskCMDB::API.send :cache_key
+      key = ForemanLiudeskCMDB::Api.send :cache_key
 
       assert key
 
       Setting[:liudesk_cmdb_token] += "2"
 
-      refute_equal key, ForemanLiudeskCMDB::API.send(:cache_key)
+      refute_equal key, ForemanLiudeskCMDB::Api.send(:cache_key)
     end
 
     it "caches the result" do
@@ -27,14 +27,14 @@ class CMDBAPITest < ActiveSupport::TestCase
         ].to_json
       )
 
-      roles = ForemanLiudeskCMDB::API.network_access_roles
+      roles = ForemanLiudeskCMDB::Api.network_access_roles
 
       assert_equal %w[Guest None], roles.sort
 
       remove_request_stub(stub_get)
 
-      assert_equal roles, ForemanLiudeskCMDB::API.network_access_roles
-      assert_equal roles, ForemanLiudeskCMDB::API.network_access_roles
+      assert_equal roles, ForemanLiudeskCMDB::Api.network_access_roles
+      assert_equal roles, ForemanLiudeskCMDB::Api.network_access_roles
     end
 
     it "handles errors" do
@@ -43,8 +43,8 @@ class CMDBAPITest < ActiveSupport::TestCase
         body: {}.to_json
       ).times(2)
 
-      assert_equal %w[None], ForemanLiudeskCMDB::API.network_access_roles
-      assert_equal %w[None], ForemanLiudeskCMDB::API.network_access_roles
+      assert_equal %w[None], ForemanLiudeskCMDB::Api.network_access_roles
+      assert_equal %w[None], ForemanLiudeskCMDB::Api.network_access_roles
     end
   end
 end

@@ -189,7 +189,7 @@ module ForemanLiudeskCMDB
     def asset
       return unless asset_id
 
-      ForemanLiudeskCMDB::API.get_asset(asset_model_type, asset_id)
+      ForemanLiudeskCMDB::Api.get_asset(asset_model_type, asset_id)
     end
 
     def hardware?
@@ -199,7 +199,7 @@ module ForemanLiudeskCMDB
     def hardware
       return unless hardware_id
 
-      ForemanLiudeskCMDB::API.get_asset(hardware_model_type, hardware_id)
+      ForemanLiudeskCMDB::Api.get_asset(hardware_model_type, hardware_id)
     end
 
     # FOREMAN-37043

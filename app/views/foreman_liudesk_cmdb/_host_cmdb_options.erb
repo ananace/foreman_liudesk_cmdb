@@ -32,7 +32,7 @@
         onchange: 'cmdb_asset_type_changed(this);', 
       })
 %>
-<%= select_f(f, :network_role, ForemanLiudeskCMDB::API.network_access_roles(existing: facet&.network_role), :to_s, :to_s,
+<%= select_f(f, :network_role, ForemanLiudeskCMDB::Api.network_access_roles(existing: facet&.network_role), :to_s, :to_s,
       { include_blank: true,
         selected: facet&.network_role,
         disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),
@@ -44,7 +44,7 @@
         label_help_options: { data: { placement: 'top' } },
       })
 %>
-<%= select_f(f, :hardware_fallback_role, ForemanLiudeskCMDB::API.network_access_roles(existing: facet&.hardware_fallback_role), :to_s, :to_s,
+<%= select_f(f, :hardware_fallback_role, ForemanLiudeskCMDB::Api.network_access_roles(existing: facet&.hardware_fallback_role), :to_s, :to_s,
       { include_blank: true,
         selected: facet&.hardware_fallback_role,
         disable_button: _(HostsAndHostgroupsHelper::INHERIT_TEXT),

@@ -7,7 +7,7 @@ class RemoveOnTypeChangeAssetTest < ActiveSupport::TestCase
     ForemanLiudeskCMDB::SyncAsset::RemoveOnTypeChange.call(
       host: host,
       asset: LiudeskCMDB::Models::LinuxClientV1.new(
-        ForemanLiudeskCMDB::API.client,
+        ForemanLiudeskCMDB::Api.client,
         hostname
       ),
       cmdb_params: host.liudesk_cmdb_facet.asset_parameters

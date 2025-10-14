@@ -52,7 +52,7 @@ class AttachThinHardwareTest < ActiveSupport::TestCase
     end
 
     it "handles errors correctly" do
-      ForemanLiudeskCMDB::API.expects(:get_asset).raises(StandardError)
+      ForemanLiudeskCMDB::Api.expects(:get_asset).raises(StandardError)
 
       refute subject.success?
       refute subject.hardware

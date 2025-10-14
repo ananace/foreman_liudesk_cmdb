@@ -2,7 +2,7 @@
 
 module ForemanLiudeskCMDB
   # Helper class for holding a CMDB API client
-  class API
+  class Api
     class << self
       def client
         @client ||= LiudeskCMDB::Client.new Setting[:liudesk_cmdb_url], subscription_key: Setting[:liudesk_cmdb_token]

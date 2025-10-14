@@ -37,7 +37,7 @@ module ForemanLiudeskCMDB
     def asset_params
       return {} unless raw_data.key? :asset
 
-      asset_klass = ForemanLiudeskCMDB::API.get_asset_type(asset_type_param || facet.asset_model_type || :server_v1)
+      asset_klass = ForemanLiudeskCMDB::Api.get_asset_type(asset_type_param || facet.asset_model_type || :server_v1)
 
       params = asset_klass.convert_cmdb_to_ruby(raw_data[:asset] || {})
       params = params.slice(*host.liudesk_cmdb_facet.asset_parameter_keys) if sliced
@@ -55,7 +55,7 @@ module ForemanLiudeskCMDB
     def hardware_params
       return {} unless raw_data.key? :hardware
 
-      asset_klass = ForemanLiudeskCMDB::API.get_asset_type(hardware_type_param || :hardware_v1)
+      asset_klass = ForemanLiudeskCMDB::Api.get_asset_type(hardware_type_param || :hardware_v1)
 
       params = asset_klass.convert_cmdb_to_ruby(raw_data[:hardware] || {})
       params = params.slice(*host.liudesk_cmdb_facet.hardware_parameter_keys) if sliced

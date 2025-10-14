@@ -26,7 +26,7 @@ class UpdateFacetHardwareTest < ActiveSupport::TestCase
   end
   let(:asset) do
     LiudeskCMDB::Models::HardwareV1.new(
-      ForemanLiudeskCMDB::API.client,
+      ForemanLiudeskCMDB::Api.client,
       hardware_id
     )
   end

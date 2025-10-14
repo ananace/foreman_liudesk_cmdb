@@ -17,7 +17,7 @@ class ArchiveAssetTest < ActiveSupport::TestCase
   let(:hardware_id) { "c1de1e3d-5a3f-45b8-9dde-26e4f38872c0" }
   let(:asset) do
     LiudeskCMDB::Models::ServerV1.new(
-      ForemanLiudeskCMDB::API.client,
+      ForemanLiudeskCMDB::Api.client,
       asset_id
     )
   end

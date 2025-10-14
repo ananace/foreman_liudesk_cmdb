@@ -12,7 +12,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          found = ForemanLiudeskCMDB::API.find_asset(facet.hardware_model_type, **search_params).sort_by do |hw|
+          found = ForemanLiudeskCMDB::Api.find_asset(facet.hardware_model_type, **search_params).sort_by do |hw|
             evaluate_correctness(hw, search_params)
           end
 

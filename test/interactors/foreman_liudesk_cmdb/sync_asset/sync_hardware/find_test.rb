@@ -144,7 +144,7 @@ class FindHardwareTest < ActiveSupport::TestCase
 
   context "when hardware is already assigned to the context" do
     let(:hardware_id) { "8ba29d8a-3eae-4a83-9772-243b62b4b0c5" }
-    let(:hardware) { LiudeskCMDB::Models::HardwareV1.new(ForemanLiudeskCMDB::API.client, hardware_id) }
+    let(:hardware) { LiudeskCMDB::Models::HardwareV1.new(ForemanLiudeskCMDB::Api.client, hardware_id) }
 
     it "does nothing" do
       assert subject.success?

@@ -57,14 +57,14 @@ class AttachHardwareTest < ActiveSupport::TestCase
 
     it "handles non-existence correctly" do
       host.liudesk_cmdb_facet.expects(:update).with(hardware_id: nil)
-      ForemanLiudeskCMDB::API.expects(:get_asset).raises(LiudeskCMDB::NotFoundError.new(nil, nil))
+      ForemanLiudeskCMDB::Api.expects(:get_asset).raises(LiudeskCMDB::NotFoundError.new(nil, nil))
 
       assert subject.success?
       refute subject.hardware
     end
 
     it "handles errors correctly" do
-      ForemanLiudeskCMDB::API.expects(:get_asset).raises(StandardError)
+      ForemanLiudeskCMDB::Api.expects(:get_asset).raises(StandardError)
 
       refute subject.success?
       refute subject.hardware

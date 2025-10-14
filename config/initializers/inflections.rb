@@ -2,5 +2,4 @@
 
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym 'CMDB'
-  inflect.acronym 'API'
 end
