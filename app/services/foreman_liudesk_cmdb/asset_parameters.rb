@@ -105,7 +105,10 @@ module ForemanLiudeskCMDB
 
     def find_hardware_serial_number
       sn = host.facts["dmi::product::serial_number"] || host.facts["serialnumber"]
+      # Cut out "To be filled by O.E.M" and "System Serial Number"
       sn = nil if sn && sn =~ / (?:O\.E\.M\.|Serial)/
+      # Cut out all zeros or 0123456789
+      sn = nil if sn && (sn.chars.all? { |c| c == '0' } || sn =~ /\A0?1234567890?\z/)
       { serial_number: sn }.compact
     end
 
