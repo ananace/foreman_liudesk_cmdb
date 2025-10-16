@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "deface"
 require "interactor"
 require "liudesk_cmdb"
 
