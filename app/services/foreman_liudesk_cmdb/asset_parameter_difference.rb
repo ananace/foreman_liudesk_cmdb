@@ -71,12 +71,13 @@ module ForemanLiudeskCMDB
 
       # Ignore case difference on MAC-addresses, LiUDesk likes to sometimes choose its own case for the input data
       data[:mac_and_network_access_roles]&.reject! do |role|
-        existing = @cached.dig(:hardware, :mac_and_network_access_roles)&.find { |r| r[:mac]&.downcase == role[:mac]&.downcase }
+        existing = @cached.dig(:hardware, :mac_and_network_access_roles)
+          &.find { |r| r[:mac]&.downcase == role[:mac]&.downcase }
         next unless existing
 
         existing[:networkAccessRole] == role[:networkAccessRole]
       end
-      data.delete :mac_and_network_access_roles if data[:mac_and_network_access_roles]&.empty?
+      data.delete :mac_and_network_access_roles if data[:mac_and_network_access_roles].to_a.empty?
     end
   end
 end

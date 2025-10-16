@@ -2,6 +2,7 @@
 
 require "rake/testtask"
 
+# rubocop:disable Metrics/BlockLength -- Rake DSL prefers it this way
 namespace :foreman_liudesk_cmdb do
   namespace :sync do
     desc "Force-sync CMDB data for all hosts"
@@ -55,6 +56,7 @@ namespace :foreman_liudesk_cmdb do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
 
 # Tests
 namespace :test do

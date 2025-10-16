@@ -45,16 +45,17 @@ module ForemanLiudeskCMDB
           divergence = 0
           if search_params[:bios_uuid]
             divergence += 9000 if hardware.bios_uuid&.downcase != search_params[:bios_uuid].downcase
-          else
-            divergence += 0.5 if hardware.bios_uuid.nil? || hardware.bios_uuid.empty?
+          elsif hardware.bios_uuid.nil? || hardware.bios_uuid.empty?
+            divergence += 0.5
           end
           if search_params[:serial_number]
             divergence += 50 if hardware.serial_number&.downcase != search_params[:serial_number].downcase
-          else
-            divergence += 0.5 if hardware.serial_number.nil? || hardware.serial_number.empty?
+          elsif hardware.serial_number.nil? || hardware.serial_number.empty?
+            divergence += 0.5
           end
           if search_params['macAndNetworkAccessRoles.mac']
-            divergence += 2 if !hardware.mac_and_network_access_roles&.any? { |nic| nic[:mac].downcase == search_params['macAndNetworkAccessRoles.mac'].downcase }
+            divergence += 2 unless hardware.mac_and_network_access_roles
+                                          &.any? { |nic| nic[:mac].downcase == search_params['macAndNetworkAccessRoles.mac'].downcase }
           end
           divergence += 1 if hardware.hostname && hardware.hostname.downcase != host.name.downcase
           divergence

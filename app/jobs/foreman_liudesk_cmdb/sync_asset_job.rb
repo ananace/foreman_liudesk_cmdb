@@ -18,7 +18,7 @@ module ForemanLiudeskCMDB
     end
 
     rescue_from(StandardError) do |error|
-      Foreman::Logging.exception("CMDB sync error", error, logger: 'background')
+      Foreman::Logging.exception("CMDB sync error", error, logger: "background")
     end
 
     def humanized_name

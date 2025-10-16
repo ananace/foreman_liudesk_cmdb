@@ -12,7 +12,7 @@ module ForemanLiudeskCMDB
         end
 
         def call
-          context.hardware = ForemanLiudeskCMDB::Api.create_asset(:hardware_v1, **params.merge(ephemeral_params))
+          context.hardware = ForemanLiudeskCMDB::Api.create_asset(:hardware_v1, **params, **ephemeral_params)
         rescue LiudeskCMDB::UnprocessableError => e
           ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                             .warn("#{self.class} error #{e}, attempting with only primary interface")

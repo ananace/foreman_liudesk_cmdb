@@ -2,6 +2,7 @@
 
 module ForemanLiudeskCMDB
   # Asset parameters retrieval helper
+  # rubocop:disable Metrics/ClassLength -- Parameter extraction is a little too simple to split into multiple files
   class AssetParameters
     def self.call(host)
       new(host).call
@@ -108,7 +109,8 @@ module ForemanLiudeskCMDB
       # Cut out "To be filled by O.E.M" and "System Serial Number"
       sn = nil if sn && sn =~ / (?:O\.E\.M\.|Serial)/
       # Cut out all zeros or 0123456789
-      sn = nil if sn && (sn.chars.all? { |c| c == '0' } || sn =~ /\A0?1234567890?\z/)
+      sn = nil if sn && (sn.chars.all? { |c| c == "0" } || sn =~ /\A0?1234567890?\z/)
+
       { serial_number: sn }.compact
     end
 
@@ -140,4 +142,5 @@ module ForemanLiudeskCMDB
       true
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

@@ -63,8 +63,8 @@ module ForemanLiudeskCMDB
               indifferent = val.with_indifferent_access
               OpenStruct.new(mac: indifferent[:mac]&.downcase, role: indifferent[:networkAccessRole]) # rubocop:disable Style/OpenStructUse
             end
-            current_mac = current&.map(&cleanup)&.select(&:mac)&.sort_by(&:mac)
-            wanted_mac = wanted&.map(&cleanup)&.select(&:mac)&.sort_by(&:mac)
+            current_mac = current.map(&cleanup).select(&:mac).sort_by(&:mac) if current
+            wanted_mac = wanted.map(&cleanup).select(&:mac).sort_by(&:mac) if wanted
 
             current_mac != wanted_mac
           else

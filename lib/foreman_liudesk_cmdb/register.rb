@@ -79,7 +79,7 @@ Foreman::Plugin.register :foreman_liudesk_cmdb do
       :main_tabs,
       name: _("CMDB"),
       partial: "foreman_liudesk_cmdb/liudesk_cmdb_facet",
-      onlyif: proc { |h| h.liudesk_cmdb_facet } # rubocop:disable Style/SymbolProc - Does not work with caller
+      onlyif: proc { |h| h.liudesk_cmdb_facet } # rubocop:disable Style/SymbolProc -- Does not work with caller
     )
   end
 end

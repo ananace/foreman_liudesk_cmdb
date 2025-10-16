@@ -214,9 +214,9 @@ module ForemanLiudeskCMDB
       public_send(path.first).dig(*path[1..])
     end
 
-    private
-
     LIUID_REX = /^[a-z]{1,5}\d{2,3}$/.freeze
+
+    private
 
     def cleanup_hardware_network_roles
       hardware_network_roles&.delete_if do |_mac, entry|
