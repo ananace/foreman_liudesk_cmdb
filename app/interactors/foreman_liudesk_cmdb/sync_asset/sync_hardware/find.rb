@@ -54,9 +54,9 @@ module ForemanLiudeskCMDB
             divergence += 0.5
           end
           if search_params["macAndNetworkAccessRoles.mac"] &&
-               !hardware.mac_and_network_access_roles&.any? do |nic|
-                 nic[:mac].downcase == search_params["macAndNetworkAccessRoles.mac"].downcase
-               end
+             !hardware.mac_and_network_access_roles&.any? do |nic|
+               nic[:mac].downcase == search_params["macAndNetworkAccessRoles.mac"].downcase
+             end
             divergence += 2
           end
           divergence += 1 if hardware.hostname && hardware.hostname.downcase != host.name.downcase
