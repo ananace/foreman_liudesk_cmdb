@@ -5,5 +5,9 @@ require_relative "foreman_liudesk_cmdb/engine"
 
 module ForemanLiudeskCMDB
   class Error < StandardError; end
-  # Your code goes here...
+
+  # Asset object was lost, likely removed by external part
+  class AssetLostError < Error; end
+  # Hardware object was lost, likely removed by external part
+  class HardwareLostError < Error; end
 end

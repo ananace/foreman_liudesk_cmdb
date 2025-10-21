@@ -23,6 +23,13 @@ module ForemanLiudeskCMDB
 
       def call
         super
+      rescue ForemanLiudeskCMDB::AssetLostError
+        # Asset object turned out to no longer exist partway through the chain, clean up and re-run from the beginning
+
+        context.asset = nil
+        facet.asset_id = nil
+
+        super
       ensure
         if context.asset&.retrieved?
           context.raw_data[:asset] = context.asset.class.convert_ruby_to_cmdb context.asset.raw_data!

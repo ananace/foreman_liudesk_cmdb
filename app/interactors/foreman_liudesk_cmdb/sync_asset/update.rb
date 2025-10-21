@@ -34,8 +34,9 @@ module ForemanLiudeskCMDB
                           .error("#{self.class} error #{e}, resetting asset id")
 
         facet.update asset_id: nil
+        context.asset = nil
 
-        context.fail!(error_obj: e, error: "#{self.class}: #{e}")
+        raise ForemanLiudeskCMDB::AssetLostError
       rescue StandardError => e
         ::Foreman::Logging.logger("foreman_liudesk_cmdb/sync")
                           .error("#{self.class} error #{e}: #{e.backtrace}")

@@ -9,6 +9,13 @@ module ForemanLiudeskCMDB
 
         def call
           super
+        rescue ForemanLiudeskCMDB::HardwareLostError
+          # Hardware object turned out to no longer exist partway through the chain, re-attempt run
+
+          context.hardware = nil
+          facet.hardware_id = nil
+
+          super
         ensure
           if context.hardware&.retrieved?
             context.raw_data[:hardware] = context.hardware.class.convert_ruby_to_cmdb context.hardware.raw_data!
