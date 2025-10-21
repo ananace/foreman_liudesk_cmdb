@@ -43,7 +43,11 @@ module ForemanLiudeskCMDB
 
         private
 
-        delegate :cached_params, :cmdb_params, :hardware, to: :context
+        delegate :cached_params, :cmdb_params, :hardware, :host, to: :context
+
+        def facet
+          host.liudesk_cmdb_facet
+        end
 
         def cached_hardware_params
           cached_params[:hardware]
