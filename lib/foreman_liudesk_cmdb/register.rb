@@ -58,8 +58,8 @@ Foreman::Plugin.register :foreman_liudesk_cmdb do
       partial: "hosts/form_liudesk_cmdb_tab",
       priority: 9001,
       onlyif: lambda do |host, _context|
-        # Skip rendering tab
-        host.liudesk_cmdb_facet && caller.none? { |call| call.include?("block in render_tab_header_for") }
+        # Skip rendering tab header here, it's done with deface to ensure it's at the end of the tabstrip
+        caller.none? { |call| call.include?("block in render_tab_header_for") }
       end
     )
 

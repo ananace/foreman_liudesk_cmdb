@@ -1,6 +1,6 @@
 <%-
   subject ||= @host
-  obj = subject.liudesk_cmdb_facet
+  obj = subject.liudesk_cmdb_facet!
 
   existing_asset_data = obj.ephemeral_attributes[:asset] || {}
   asset_data = OpenStruct.new(((obj.raw_data || {}).with_indifferent_access[:asset] || {}).merge(existing_asset_data))
