@@ -7,7 +7,7 @@ module ForemanLiudeskCMDB
       return {} unless host.liudesk_cmdb_facet
 
       {
-        cmdb: JSON.parse(host.liudesk_cmdb_facet.cached_asset_parameters.merge(
+        cmdb: JSON.parse(ForemanLiudeskCMDB::CachedAssetParameters.call(host, sliced: false, compacted: true).merge(
           sync: {
             at: host.liudesk_cmdb_facet.sync_at,
             error: host.liudesk_cmdb_facet.sync_error
